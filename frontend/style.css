@@ -1,4 +1,11 @@
+/* -------------- Footer -------------- */
 footer {
     background-color: black;
-    color: white;
+    color: white; 
+}
+footer a {
+    color : white !important;
+}
+footer a:hover {
+    color : #AF7357 !important;
 }
