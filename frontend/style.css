@@ -1,3 +1,18 @@
+/* -------------- Header -------------- */
+header {
+    background-color: #F5F5F7 !important;
+    color: black; 
+}
+.bg-body-tertiary {
+    background-color: #F5F5F7 !important;
+
+}
+.navbar-toggler:focus{ 
+    outline: unset;
+    border: unset;
+    box-shadow: none;
+}
+
 /* -------------- Footer -------------- */
 footer {
     background-color: black;
@@ -8,4 +23,19 @@ footer a {
 }
 footer a:hover {
     color : #AF7357 !important;
+}
+
+/* -------------- Bouton -------------- */
+
+.btn-dark:hover {
+    background-color: #ABABAB !important;
+    border-color: #ABABAB !important;
+    color: white;
+}
+
+/* -------------- Séparateur -------------- */
+
+.brown-box {
+    background-color: #AF7357 !important;
+    height: 10px;
 }
