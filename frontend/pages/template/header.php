@@ -39,6 +39,7 @@
                         <li><a class="dropdown-item" href="#">Votre profil</a></li>
                         <li><a class="dropdown-item" href="#">Vos documents</a></li>
                         <li><a class="dropdown-item" href="#">Vos comptes</a></li>
+                        <li><a class="dropdown-item" href="#">Vos réservations</a></li>
                         <li><a class="dropdown-item" href="#">Logements favoris</a></li>
                       </ul>
                     </li>
