@@ -13,7 +13,7 @@
   <body>
     <header>
       <div class="row p-3 d-flex justify-content-center align-items-center">
-        <div class="col">
+        <div class="col-2">
           <!-- Barre de navigation -->
           <nav class="navbar bg-body-tertiary">
             <div class="container-fluid">
@@ -22,6 +22,8 @@
               </button>
               <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbarLight">
                 <div class="offcanvas-header">
+                  <!-- Image du menu -->
+                  <img src="../assets/logos/icon_dark.png" alt="Icon" class="img-fluid" width="50px">
                   <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
                 </div>
                 <div class="offcanvas-body">
@@ -31,38 +33,83 @@
                     </li>
                     <li class="nav-item dropdown">
                       <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Votre compte
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Votre profil</a></li>
+                        <li><a class="dropdown-item" href="#">Vos documents</a></li>
+                        <li><a class="dropdown-item" href="#">Vos comptes</a></li>
+                        <li><a class="dropdown-item" href="#">Logements favoris</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Espace bailleur
                       </a>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li>
-                          <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        <li><a class="dropdown-item" href="#">Vos biens</a></li>
+                        <li><a class="dropdown-item" href="#">Réservations</a></li>
+                        <li><a class="dropdown-item" href="#">Vos interventions</a></li>
                       </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Espace prestataire
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Vos prestations</a></li>
+                        <li><a class="dropdown-item" href="#">Vos interventions</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Espace administrateur
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Utilisateurs</a></li>
+                        <li><a class="dropdown-item" href="#">Biens</a></li>
+                        <li><a class="dropdown-item" href="#">Services</a></li>
+                        <li><a class="dropdown-item" href="#">Demandes en attente</a></li>
+                        <li><a class="dropdown-item" href="#">Documents</a></li>
+                        <li><a class="dropdown-item" href="#">Gestion technique</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">Trouvez un logement</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">Trouvez un service</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">Messagerie</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">Contact</a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="#">Devenir Premium</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#">Contact</a>
+                      <a class="nav-link" href="#">Connectez-vous</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">Nous rejoindre</a>
                     </li>
                   </ul>
                   <form class="d-flex mt-3" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <input class="form-control me-2" type="search" placeholder="Tapez votre recherche" aria-label="Search">
+                    <button class="btn btn-outline" type="submit">Rechercher</button>
                   </form>
                 </div>
               </div>
             </div>
           </nav>
         </div>
-        <div class="col-5 text-center">
+        <div class="col text-center">
           <!-- Titre -->
           <img src="../assets/logos/title_dark.png" width="200px">
         </div>
-        <div class="col text-end">
+        <div class="col-2 text-end d-none d-md-block">
           <!-- Bouton de connexion/inscription -->
           <button type="button" class="btn btn-dark">Connexion</button>
           <button type="button" class="btn btn-dark">Inscription</button>
@@ -71,52 +118,3 @@
       <!-- Séparateur -->
       <div class="brown-box"></div>
     </header>
-
-
-
-    
-  <!-- 
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.php">ESGI</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="index.php">Accueil</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="contact.php">Contact</a>
-          </li>
-
-
-          <?php// if (!isConnected()){ ?>
-
-          <li class="nav-item">
-            <a class="nav-link" href="register.php">S'inscrire</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="login.php">Se connecter</a>
-          </li>
-
-        <?php// } else { ?>
-
-
-          <li class="nav-item">
-            <a class="nav-link" href="users.php">Liste des utilisateurs</a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="logout.php">Se déconnecter</a>
-          </li>
-
-        <?php// } ?>
-
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container"> -->

@@ -1,3 +1,11 @@
+/* -------------- Body -------------- */
+body {
+    font-family : "Montserrat", sans-serif;
+    font-optical-sizing : auto;
+    font-weight : 100;
+    font-style : normal;
+}
+
 /* -------------- Header -------------- */
 header {
     background-color: #F5F5F7 !important;
@@ -11,6 +19,21 @@ header {
     outline: unset;
     border: unset;
     box-shadow: none;
+}
+.dropdown-item:hover {
+    background-color: #F5F5F7;
+}
+.dropdown-item:focus {
+    background-color:#AF7357;
+}
+.navbar-nav .nav-item:hover .nav-link {
+    color: #AF7357;
+}
+.navbar-nav .nav-item .nav-link {
+    color: black;
+}
+.dropdown-toggle::after, .dropdown-toggle::before {
+    border-top-color: #ABABAB;
 }
 
 /* -------------- Footer -------------- */
