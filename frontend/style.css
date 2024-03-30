@@ -24,7 +24,8 @@ header {
     background-color: #F5F5F7;
 }
 .dropdown-item:focus {
-    background-color:#AF7357;
+    background-color:black;
+    color: white;
 }
 .navbar-nav .nav-item:hover .nav-link {
     color: #AF7357;
