@@ -60,9 +60,12 @@ footer a:hover {
     border-color: #ABABAB !important;
     color: white;
 }
-
-.btn-margin-top {
+.btn-margin {
     margin-top: 30px;
+    margin-bottom: 30px;
+}
+.btn-hover-brown:hover {
+    background-color: #AF7357 !important;
 }
 
 /* -------------- Séparateur -------------- */
@@ -82,12 +85,20 @@ footer a:hover {
 .lightgrey-box {
     background-color: #F5F5F7;
 }
-
 .my-4 {
     margin-bottom: unset !important;
+    margin-top: unset !important;
 }
 .box-margin-right {
     padding-right: 5%;
+}
+.box-margin-left {
+    padding-left: 5%;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
 }
 
 /* -------------- Titre -------------- */
@@ -99,5 +110,18 @@ footer a:hover {
 }
 
 h2 {
+    font-weight: 600;
     margin-bottom: 30px;
+}
+
+h1 {
+    color: black;
+}
+
+/* -------------- Hero -------------- */
+#hero-home {
+    background-image: url("assets/images/chambre-hotel-beige-transparent.jpg");
+    background-position: center;
+    background-size: cover;
+    min-height: 500px;
 }
