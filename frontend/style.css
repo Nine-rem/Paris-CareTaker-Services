@@ -35,6 +35,10 @@ header {
 .dropdown-toggle::after, .dropdown-toggle::before {
     border-top-color: #ABABAB;
 }
+.form-control:focus {
+    border-color: #AF7357;
+    box-shadow: 0 0 0 0.25rem rgba(175, 115, 87, 0.25);
+}
 
 /* -------------- Footer -------------- */
 footer {

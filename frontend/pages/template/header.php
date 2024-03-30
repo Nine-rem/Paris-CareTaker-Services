@@ -96,9 +96,10 @@
                       <a class="nav-link" href="#">Nous rejoindre</a>
                     </li>
                   </ul>
+                  <!-- Barre de recherche -->
                   <form class="d-flex mt-3" role="search">
                     <input class="form-control me-2" type="search" placeholder="Tapez votre recherche" aria-label="Search">
-                    <button class="btn btn-outline" type="submit">Rechercher</button>
+                    <button class="btn btn-dark" type="submit">Rechercher</button>
                   </form>
                 </div>
               </div>
