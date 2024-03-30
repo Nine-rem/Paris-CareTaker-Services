@@ -117,5 +117,5 @@
         </div>
       </div>
       <!-- Séparateur -->
-      <div class="brown-box"></div>
+      <div class="brown-separator"></div>
     </header>

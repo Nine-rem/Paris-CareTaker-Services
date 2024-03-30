@@ -61,9 +61,43 @@ footer a:hover {
     color: white;
 }
 
+.btn-margin-top {
+    margin-top: 30px;
+}
+
 /* -------------- Séparateur -------------- */
 
-.brown-box {
+.brown-separator {
     background-color: #AF7357 !important;
     height: 10px;
+}
+
+/* -------------- Bloc -------------- */
+.box {
+    padding-top: 5%;
+    padding-bottom: 5%;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+.lightgrey-box {
+    background-color: #F5F5F7;
+}
+
+.my-4 {
+    margin-bottom: unset !important;
+}
+.box-margin-right {
+    padding-right: 5%;
+}
+
+/* -------------- Titre -------------- */
+.uppercase {
+    text-transform: uppercase;
+}
+.centered-text {
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 30px;
 }
