@@ -6,7 +6,7 @@
 <?php include "template/header.php";?>
 
 <!-- Hero -->
-<div id="hero-home" class="px-4 py-5 d-flex justify-content-start align-items-center">
+<div id="hero" class="px-4 py-5 d-flex justify-content-start align-items-center hero-primary">
     <div class="py-5 box-margin-left">
         <h1 class="display-5 fw-bold">Location saisonnière et <br>services exclusifs</h1>
         <p class="fs-5 mb-4">Réservez une expérience unique en un clic avec Paris Caretaker Services</p>
@@ -21,7 +21,7 @@
 
 <!-- Bloc à propos -->
 <div id="services" class="box lightgrey-box row vertical-align">
-    <div class="col-md-6 align-self-start box-margin-right">
+    <div class="col-md-6 align-self-center box-margin-right">
         <img src="../assets/images/equipe-pcs.jpg" class="img-fluid" width="650px">
     </div>
     <div class="col-md-6">
@@ -37,8 +37,8 @@
 </div>
 
 <!-- Bloc demande de devis -->
-<div id="quote" class="box lightgrey-box row vertical-align">
-    <div class="col-md-6 align-self-start box-margin-right">
+<div id="quote" class="box lightgrey-box row">
+    <div class="col-md-6 align-self-center box-margin-right">
         <h2>Bailleur ? Simplifiez-vous la vie !</h2>
         <p>Découvrez une façon simple et efficace de mettre votre bien en location saisonnière en vous inscrivant sur notre site dès aujourd'hui. Nous proposons plusieurs formules de gestion adaptées à vos besoins, vous permettant de maximiser vos revenus tout en minimisant les tracas.</p>
         <p>Il vous suffit de cliquer sur un bouton pour démarrer : nous nous occupons de tout le reste, de la gestion des réservations à l'accueil des voyageurs. Laissez-nous prendre en charge la gestion de votre bien pour que vous puissiez profiter pleinement de vos revenus locatifs, sans effort supplémentaire de votre part</p>
@@ -53,7 +53,7 @@
 
 <!-- Bloc prestataire -->
 <div id="services" class="box row vertical-align">
-    <div class="col-md-6 align-self-start box-margin-right">
+    <div class="col-md-6 align-self-center box-margin-right">
         <img src="../assets/images/blanchisserie.jpg" class="img-fluid" width="650px">
     </div>
     <div class="col-md-6">
