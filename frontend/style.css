@@ -119,9 +119,14 @@ h1 {
 }
 
 /* -------------- Hero -------------- */
-#hero-home {
-    background-image: url("assets/images/chambre-hotel-beige-transparent.jpg");
+#hero {
+    background-image: url("assets/images/chambre-hotel-tropical-transparent.jpg");
     background-position: center;
     background-size: cover;
-    min-height: 500px;
+}
+.hero-primary {
+    height: 500px;
+}
+.hero-secondary {
+    height: 300px;
 }
