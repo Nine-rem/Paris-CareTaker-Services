@@ -130,3 +130,20 @@ h1 {
 .hero-secondary {
     height: 300px;
 }
+
+/* -------------- Legal -------------- */
+.accordion-button:not(.collapsed) {
+    color: white !important;
+    background-color: black !important;
+}
+.accordion-button {
+    color: white !important;
+    background-color: #ABABAB !important;
+}
+.accordion-button:focus {
+    box-shadow: unset !important;
+}
+.text-up {
+    font-weight: 600;
+    font-size: 1.2rem;
+}

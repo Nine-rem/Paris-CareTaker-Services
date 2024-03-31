@@ -5,6 +5,7 @@
 				<li class="nav-item"><a href="#" class="nav-link px-2">Service</a></li>
 				<li class="nav-item"><a href="#" class="nav-link px-2">Devis</a></li>
 				<li class="nav-item"><a href="#" class="nav-link px-2">Mentions légales</a></li>
+				<li class="nav-item"><a href="#" class="nav-link px-2">Cookies</a></li>
 				<li class="nav-item"><a href="#" class="nav-link px-2">CGV</a></li>
 				<li class="nav-item"><a href="#" class="nav-link px-2">Contact</a></li>
 			</ul>
