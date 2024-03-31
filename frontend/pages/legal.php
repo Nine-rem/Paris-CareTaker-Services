@@ -1,8 +1,3 @@
-<?php 
-//session_start();
-//require "conf.inc.php";
-//require "core/functions.php";
-?>
 <?php include "template/header.php";?>
 
 <!-- Hero -->
