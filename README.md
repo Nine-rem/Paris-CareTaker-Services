@@ -8,3 +8,4 @@ Pour utiliser laravel:
 - exécuter la commande **composer install** qui va installer toutes les dépendances
 
 Si toutes les dépendances ont été correctement installées tester avec **php artisan serve**
+Il est aussi nécessaire d'installer node.js afin d'utiliser les commandes npm
