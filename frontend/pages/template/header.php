@@ -48,6 +48,7 @@
                         Espace bailleur
                       </a>
                       <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Nouveau bien</a></li>                        
                         <li><a class="dropdown-item" href="#">Vos biens</a></li>
                         <li><a class="dropdown-item" href="#">Réservations</a></li>
                         <li><a class="dropdown-item" href="#">Vos interventions</a></li>
@@ -58,6 +59,7 @@
                         Espace prestataire
                       </a>
                       <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Nouvelle prestations</a></li>
                         <li><a class="dropdown-item" href="#">Vos prestations</a></li>
                         <li><a class="dropdown-item" href="#">Vos interventions</a></li>
                       </ul>

@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "mariadb": "^3.3.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.9.4"
   }
 }
