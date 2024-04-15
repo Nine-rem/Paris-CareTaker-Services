@@ -118,6 +118,11 @@ h1 {
     color: black;
 }
 
+h3 {
+    color: #AF7357;
+    font-size: 1rem;
+    font-weight: 600;
+}
 /* -------------- Hero -------------- */
 #hero {
     background-image: url("assets/images/chambre-hotel-tropical-transparent.jpg");
