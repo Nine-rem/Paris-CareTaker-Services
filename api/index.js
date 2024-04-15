@@ -20,6 +20,20 @@ app.get('/biens', (req, res) => {
   });
 });
 
+// Supression d'un bien
+
+// vérifier si admin ou propriétaire et si bien existe avant
+app.delete('/bien/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  connection.query('DELETE FROM pcs_bien WHERE id = ?', [id], (err) => {
+    if (err) {
+      res.status(500).send('Erreur lors de la suppression du bien');
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
+
 
 /* ----------------------------------------------------------
       Gestion des agences
