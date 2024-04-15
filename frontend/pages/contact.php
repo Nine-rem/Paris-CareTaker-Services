@@ -26,8 +26,17 @@
                 } else {
                     $agences = json_decode($response, true);
                     if (!empty($agences)) {
+                        function comparerVille($a, $b) {
+                            return strcmp($a['ville'], $b['ville']);
+                        }
+                        usort($agences, 'comparerVille');
+
                         foreach ($agences as $agence) {
-                            echo '<p>ID: ' . $agence['id'] . ', Adresse: ' . $agence['adresse'] . '</p>';
+                            $icone_cle = ($agence['boite_cle'] == 1) ? '<img src="../assets/images/cle.png" alt="Boite à clé disponible" title="Boite à clé disponible" width="20px"> ' : '';
+                            echo '<h3>'.$agence['ville'].' ('.$agence['cp'].') '.$icone_cle.'</h3>';
+                            echo $agence['adresse'];
+                            echo '<br>Téléphone : (+33) '.$agence['tel'];
+                            echo '<br>Email : '.$agence['email'].'<br><br>';
                         }
                     } else {
                         echo 'Aucune agence trouvée.';
