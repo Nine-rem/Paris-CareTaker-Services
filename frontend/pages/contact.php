@@ -22,7 +22,7 @@
             <?php
                 $response = file_get_contents('http://localhost:5000/agences');
                 if ($response === false) {
-                    echo 'Erreur lors de la récupération des agences.';
+                    header("Location: error.php");
                 } else {
                     $agences = json_decode($response, true);
                     if (!empty($agences)) {
