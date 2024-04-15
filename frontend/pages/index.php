@@ -10,7 +10,7 @@
     <div class="py-5 box-margin-left">
         <h1 class="display-5 fw-bold">Location saisonnière et <br>services exclusifs</h1>
         <p class="fs-5 mb-4">Réservez une expérience unique en un clic avec Paris Caretaker Services</p>
-        <button class="btn btn-dark btn-hover-brown" type="button">Trouvez un logement</button>
+        <button class="btn btn-dark btn-hover-brown" type="button" onclick="window.location.href='stay-all.php'">Trouvez un logement</button>
     </div>
 </div>
 
