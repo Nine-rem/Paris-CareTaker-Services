@@ -20,11 +20,11 @@
             <table class="table table-striped table-hover">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Bien</th>
+                        <th>Location</th>
                         <th>Type de location</th>
                         <th>Capacité</th>
                         <th>Surface (m2)</th>
-                        <th>Adresse</th>
+                        <th>Localisation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +44,7 @@
                                         echo '<td>'.$bien['type_location'].'</td>';
                                         echo '<td>'.$bien['capacite'].'</td>';
                                         echo '<td>'.$bien['surface'].'</td>';
-                                        echo '<td>'.$bien['adresse'].', '.$bien['cp'].' '.$bien['ville'].'</td>';
+                                        echo '<td>'.$bien['ville'].' ('.$bien['cp'].')</td>';
                                         echo '</tr>';
                                     }
                                 }
