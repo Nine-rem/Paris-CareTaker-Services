@@ -49,6 +49,9 @@ app.get('/agences/:id', (req, res) => {
 });
 
 // Création d'une agence
+
+// Vérifier si connecter et admin, vérifier si toutes les datas sont bien saisies et si le bien n'existe pas déjà dans la bdd
+
 app.post('/agences', (req, res) => {
   const data = req.body;
   connection.query('INSERT INTO pcs_agence SET ?', data, (err) => {
@@ -63,6 +66,9 @@ app.post('/agences', (req, res) => {
 // Modification d'une agence
 
 // Suppression d'une agence
+
+// vérifier si cooneccté et admin et agence existe en bdd 
+
 app.delete('/agences/:id', (req, res) => {
   const id = parseInt(req.params.id);
   connection.query('DELETE FROM pcs_agence WHERE id = ?', [id], (err) => {
