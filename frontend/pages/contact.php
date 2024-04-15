@@ -20,23 +20,23 @@
     <div class="col-md-6">
         <h2>Nos agences</h2>
             <?php
-                $response = file_get_contents('http://localhost:5000/agences');
+                $response = file_get_contents('http://localhost:5000/agence');
                 if ($response === false) {
                     header("Location: error.php");
                 } else {
-                    $agences = json_decode($response, true);
-                    if (!empty($agences)) {
+                    $agencies = json_decode($response, true);
+                    if (!empty($agencies)) {
                         function comparerVille($a, $b) {
                             return strcmp($a['ville'], $b['ville']);
                         }
-                        usort($agences, 'comparerVille');
+                        usort($agencies, 'comparerVille');
 
-                        foreach ($agences as $agence) {
-                            $icone_cle = ($agence['boite_cle'] == 1) ? '<img src="../assets/images/cle.png" alt="Boite à clé disponible" title="Boite à clé disponible" width="20px"> ' : '';
-                            echo '<h3>'.$agence['ville'].' ('.$agence['cp'].') '.$icone_cle.'</h3>';
-                            echo $agence['adresse'];
-                            echo '<br>Téléphone : (+33) '.$agence['tel'];
-                            echo '<br>Email : '.$agence['email'].'<br><br>';
+                        foreach ($agencies as $agencie) {
+                            $icon_key = ($agencie['boite_cle'] == 1) ? '<img src="../assets/images/cle.png" alt="Boite à clé disponible" title="Boite à clé disponible" width="20px"> ' : '';
+                            echo '<h3>'.$agencie['ville'].' ('.$agencie['cp'].') '.$icon_key.'</h3>';
+                            echo $agencie['adresse'];
+                            echo '<br>Téléphone : (+33) '.$agencie['tel'];
+                            echo '<br>Email : '.$agencie['email'].'<br><br>';
                         }
                     } else {
                         echo 'Aucune agence trouvée.';
