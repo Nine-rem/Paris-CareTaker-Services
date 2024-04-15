@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                     <?php
-                        $response = file_get_contents('http://localhost:5000/biens');
+                        $response = file_get_contents('http://localhost:5000/bien');
                         if ($response === false) {
                             header("Location: error.php");
                         } else {

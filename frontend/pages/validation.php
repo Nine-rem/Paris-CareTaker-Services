@@ -29,22 +29,22 @@
             </thead>
             <tbody>
                 <?php
-                    $response = file_get_contents('http://localhost:5000/biens');
+                    $response = file_get_contents('http://localhost:5000/bien');
                     if ($response === false) {
                         header("Location: error.php");
                     } else {
-                        $biens = json_decode($response, true);
-                        if (!empty($biens)) {
-                            foreach ($biens as $bien) {
-                                if($bien['statut'] == 0) {
-                                    $icone_pmr = ($bien['PMR_ok'] == 1) ? '<img src="../assets/images/pmr.png" alt="Accès PMR" title="Accès PMR" width="15px"> ' : '';
-                                    $icone_animal = ($bien['animal_ok'] == 1) ? '<img src="../assets/images/animal.png" alt="Pet friendly" title="Pet friendly" width="17px"> ' : '';
+                        $stays = json_decode($response, true);
+                        if (!empty($stays)) {
+                            foreach ($stays as $stay) {
+                                if($stay['statut'] == 0) {
+                                    $icon_pmr = ($stay['PMR_ok'] == 1) ? '<img src="../assets/images/pmr.png" alt="Accès PMR" title="Accès PMR" width="15px"> ' : '';
+                                    $icon_pet = ($stay['animal_ok'] == 1) ? '<img src="../assets/images/animal.png" alt="Pet friendly" title="Pet friendly" width="17px"> ' : '';
                                     echo '<tr>';
-                                    echo '<td class="align-middle">'.$bien['nom'].' '.$icone_pmr.$icone_animal.'</td>';
-                                    echo '<td class="align-middle">'.$bien['type_location'].'</td>';
-                                    echo '<td class="align-middle">'.$bien['capacite'].'</td>';
-                                    echo '<td class="align-middle">'.$bien['surface'].'</td>';
-                                    echo '<td class="align-middle">'.$bien['ville'].' ('.$bien['cp'].')</td>';
+                                    echo '<td class="align-middle">'.$stay['nom'].' '.$icon_pmr.$icon_pet.'</td>';
+                                    echo '<td class="align-middle">'.$stay['type_location'].'</td>';
+                                    echo '<td class="align-middle">'.$stay['capacite'].'</td>';
+                                    echo '<td class="align-middle">'.$stay['surface'].'</td>';
+                                    echo '<td class="align-middle">'.$stay['ville'].' ('.$stay['cp'].')</td>';
                                     echo '<td class="align-middle"><button class="btn btn-dark btn-hover-brown" type="button">Consulter</button>';
                                 }
                             }
