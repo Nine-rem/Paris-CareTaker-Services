@@ -123,6 +123,11 @@ h3 {
     font-size: 1rem;
     font-weight: 600;
 }
+
+.box-margin-left {
+    padding-left: 0% !important;
+}
+
 /* -------------- Hero -------------- */
 #hero {
     background-image: url("assets/images/chambre-hotel-tropical-transparent.jpg");

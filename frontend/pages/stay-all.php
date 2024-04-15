@@ -12,6 +12,11 @@
     </div>
 </div>
 
+<!-- Bloc recherche d'un bien -->
+<div id="search-stay" class="box centered-text">
+    <h2>Trouvez la location de vos rêves !</h2>
+</div>
+
 <!-- Bloc tous les biens -->
 <div id="all-stays" class="box lightgrey-box row">
     <div class="col-md-12">
