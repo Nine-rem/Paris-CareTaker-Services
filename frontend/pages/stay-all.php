@@ -1,8 +1,3 @@
-<?php 
-//session_start();
-//require "conf.inc.php";
-//require "core/functions.php";
-?>
 <?php include "template/header.php";?>
 
 <!-- Hero -->
@@ -45,11 +40,11 @@
                                         $icone_pmr = ($bien['PMR_ok'] == 1) ? '<img src="../assets/images/pmr.png" alt="Accès PMR" title="Accès PMR" width="15px"> ' : '';
                                         $icone_animal = ($bien['animal_ok'] == 1) ? '<img src="../assets/images/animal.png" alt="Pet friendly" title="Pet friendly" width="17px"> ' : '';
                                         echo '<tr>';
-                                        echo '<td>'.$bien['nom'].' '.$icone_pmr.$icone_animal.'</td>';
-                                        echo '<td>'.$bien['type_location'].'</td>';
-                                        echo '<td>'.$bien['capacite'].'</td>';
-                                        echo '<td>'.$bien['surface'].'</td>';
-                                        echo '<td>'.$bien['ville'].' ('.$bien['cp'].')</td>';
+                                        echo '<td class="align-middle">'.$bien['nom'].' '.$icone_pmr.$icone_animal.'</td>';
+                                        echo '<td class="align-middle">'.$bien['type_location'].'</td>';
+                                        echo '<td class="align-middle">'.$bien['capacite'].'</td>';
+                                        echo '<td class="align-middle">'.$bien['surface'].'</td>';
+                                        echo '<td class="align-middle">'.$bien['ville'].' ('.$bien['cp'].')</td>';
                                         echo '</tr>';
                                     }
                                 }
