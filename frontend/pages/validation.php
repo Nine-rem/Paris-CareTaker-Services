@@ -36,15 +36,15 @@
                         $stays = json_decode($response, true);
                         if (!empty($stays)) {
                             foreach ($stays as $stay) {
-                                if($stay['statut'] == 0) {
-                                    $icon_pmr = ($stay['PMR_ok'] == 1) ? '<img src="../assets/images/pmr.png" alt="Accès PMR" title="Accès PMR" width="15px"> ' : '';
-                                    $icon_pet = ($stay['animal_ok'] == 1) ? '<img src="../assets/images/animal.png" alt="Pet friendly" title="Pet friendly" width="17px"> ' : '';
+                                if($stay['statut_bien'] == 0) {
+                                    $icon_pmr = ($stay['PMR_ok_bien'] == 1) ? '<img src="../assets/images/pmr.png" alt="Accès PMR" title="Accès PMR" width="15px"> ' : '';
+                                    $icon_pet = ($stay['animal_ok_bien'] == 1) ? '<img src="../assets/images/animal.png" alt="Pet friendly" title="Pet friendly" width="18px"> ' : '';
                                     echo '<tr>';
-                                    echo '<td class="align-middle">'.$stay['nom'].' '.$icon_pmr.$icon_pet.'</td>';
-                                    echo '<td class="align-middle">'.$stay['type_location'].'</td>';
-                                    echo '<td class="align-middle">'.$stay['capacite'].'</td>';
-                                    echo '<td class="align-middle">'.$stay['surface'].'</td>';
-                                    echo '<td class="align-middle">'.$stay['ville'].' ('.$stay['cp'].')</td>';
+                                    echo '<td class="align-middle">'.$stay['nom_bien'].' '.$icon_pmr.$icon_pet.'</td>';
+                                    echo '<td class="align-middle">'.$stay['type_location_bien'].'</td>';
+                                    echo '<td class="align-middle">'.$stay['capacite_bien'].'</td>';
+                                    echo '<td class="align-middle">'.$stay['surface_bien'].'</td>';
+                                    echo '<td class="align-middle">'.$stay['ville_bien'].' ('.$stay['cp_bien'].')</td>';
                                     echo '<td class="align-middle"><button class="btn btn-dark btn-hover-brown" type="button">Consulter</button>';
                                 }
                             }

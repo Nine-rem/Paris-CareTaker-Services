@@ -23,9 +23,21 @@ app.get('/bien', (req, res) => {
 // Extraction d'un bien
 app.get('/bien/:id', (req, res) => {
   const id = req.params.id;
-  connection.query('SELECT * FROM pcs_bien WHERE id = ?', [id], (err, results) => {
+  connection.query('SELECT * FROM pcs_bien, pcs_utilisateur WHERE id_utilisateur = bailleur AND id_bien = ?', [id], (err, results) => {
     if (err) {
       res.status(500).json({ error: 'Erreur lors de la récupération du bien' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// Extraction des équipements d'un bien
+app.get('/bien-equipement/:id', (req, res) => {
+  const id = req.params.id;
+  connection.query('SELECT nom, pcs_equipement.id FROM pcs_bien_possede, pcs_equipement WHERE bien = ? and equipement = pcs_equipement.id', [id], (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Erreur lors de la récupération des équipements du bien' });
     } else {
       res.status(200).json(results);
     }
@@ -36,14 +48,14 @@ app.get('/bien/:id', (req, res) => {
 // A FAIRE : vérifier si admin ou propriétaire
 app.delete('/bien/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  connection.query('SELECT id FROM pcs_bien WHERE id = ?', [id], (err, results) => {
+  connection.query('SELECT id FROM pcs_bien WHERE id_bien = ?', [id], (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la recherche du bien');
     } else {
       if (results.length === 0) {
         res.status(404).send('Bien introuvable');
       } else {
-        connection.query('DELETE FROM pcs_bien WHERE id = ?', [id], (err) => {
+        connection.query('DELETE FROM pcs_bien WHERE id_bien = ?', [id], (err) => {
           if (err) {
             res.status(500).send('Erreur lors de la suppression du bien');
           } else {
@@ -74,7 +86,7 @@ app.get('/agence', (req, res) => {
 // Extraction d'une agence
 app.get('/agence/:id', (req, res) => {
   const id = req.params.id;
-  connection.query('SELECT * FROM pcs_agence WHERE id = ?', [id], (err, results) => {
+  connection.query('SELECT * FROM pcs_agence WHERE id_agence = ?', [id], (err, results) => {
     if (err) {
       res.status(500).json({ error: 'Erreur lors de la récupération de l\'agence' });
     } else {
@@ -106,7 +118,7 @@ app.post('/agences', (req, res) => {
 
 app.delete('/agences/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  connection.query('DELETE FROM pcs_agence WHERE id = ?', [id], (err) => {
+  connection.query('DELETE FROM pcs_agence WHERE id_agence = ?', [id], (err) => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression de l\'agence');
     } else {
