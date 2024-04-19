@@ -1,7 +1,7 @@
 <?php 
 //session_start();
 //require "conf.inc.php";
-//require "core/functions.php";
+require "../core/functions.php";
 ?>
 <?php include "template/header.php";?>
 
@@ -26,17 +26,16 @@
                 } else {
                     $agencies = json_decode($response, true);
                     if (!empty($agencies)) {
-                        function comparerVille($a, $b) {
-                            return strcmp($a['ville'], $b['ville']);
-                        }
-                        usort($agencies, 'comparerVille');
 
+                        // Affichage dans l'ordre alphabétique
+                        usort($agencies, 'compareCity');
+                        
                         foreach ($agencies as $agencie) {
                             $icon_key = ($agencie['boite_cle'] == 1) ? '<img src="../assets/images/cle.png" alt="Boite à clé disponible" title="Boite à clé disponible" width="20px"> ' : '';
-                            echo '<h3>'.$agencie['ville'].' ('.$agencie['cp'].') '.$icon_key.'</h3>';
-                            echo $agencie['adresse'];
-                            echo '<br>Téléphone : (+33) '.$agencie['tel'];
-                            echo '<br>Email : '.$agencie['email'].'<br><br>';
+                            echo '<h3>'.$agencie['ville_agence'].' ('.$agencie['cp_agence'].') '.$icon_key.'</h3>';
+                            echo $agencie['adresse_agence'];
+                            echo '<br>Téléphone : (+33) '.$agencie['tel_agence'];
+                            echo '<br>Email : '.$agencie['email_agence'].'<br><br>';
                         }
                     } else {
                         echo 'Aucune agence trouvée.';

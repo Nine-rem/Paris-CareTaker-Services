@@ -36,15 +36,15 @@
                             $biens = json_decode($response, true);
                             if (!empty($biens)) {
                                 foreach ($biens as $bien) {
-                                    if($bien['statut'] == 1) {
-                                        $icone_pmr = ($bien['PMR_ok'] == 1) ? '<img src="../assets/images/pmr.png" alt="Accès PMR" title="Accès PMR" width="15px"> ' : '';
-                                        $icone_animal = ($bien['animal_ok'] == 1) ? '<img src="../assets/images/animal.png" alt="Pet friendly" title="Pet friendly" width="17px"> ' : '';
+                                    if($bien['statut_bien'] == 1) {
+                                        $icone_pmr = ($bien['PMR_ok_bien'] == 1) ? '<img src="../assets/images/pmr.png" alt="Accès PMR" title="Accès PMR" width="15px"> ' : '';
+                                        $icone_animal = ($bien['animal_ok_bien'] == 1) ? '<img src="../assets/images/animal.png" alt="Pet friendly" title="Pet friendly" width="17px"> ' : '';
                                         echo '<tr>';
-                                        echo '<td class="align-middle">'.$bien['nom'].' '.$icone_pmr.$icone_animal.'</td>';
-                                        echo '<td class="align-middle">'.$bien['type_location'].'</td>';
-                                        echo '<td class="align-middle">'.$bien['capacite'].'</td>';
-                                        echo '<td class="align-middle">'.$bien['surface'].'</td>';
-                                        echo '<td class="align-middle">'.$bien['ville'].' ('.$bien['cp'].')</td>';
+                                        echo '<td class="align-middle">'.$bien['nom_bien'].' '.$icone_pmr.$icone_animal.'</td>';
+                                        echo '<td class="align-middle">'.$bien['type_location_bien'].'</td>';
+                                        echo '<td class="align-middle">'.$bien['capacite_bien'].'</td>';
+                                        echo '<td class="align-middle">'.$bien['surface_bien'].'</td>';
+                                        echo '<td class="align-middle">'.$bien['ville_bien'].' ('.$bien['cp_bien'].')</td>';
                                         echo '</tr>';
                                     }
                                 }
