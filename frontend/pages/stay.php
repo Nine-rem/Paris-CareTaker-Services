@@ -55,9 +55,15 @@
     </div>
         <div class="d-flex justify-content-center align-items-center">
         <button class="btn btn-dark btn-hover-brown mt-5 mx-3" type="button" onclick="#">Réserver ce logement</button>
-        <button class="btn btn-success mt-5 mx-3" type="button" onclick="#">Valider</button>
-        <button class="btn btn-danger mt-5 mx-3" type="button" onclick="#">Supprimer</button>
         <button class="btn btn-dark btn-hover-brown mt-5 mx-3" type="button" onclick="#">Modifier</button>
+        <button class="btn btn-danger mt-5 mx-3" type="button" onclick="#">Supprimer</button>
+        <?php
+            if($data['statut_bien'] == 0) {
+        ?>
+        <button class="btn btn-success mt-5 mx-3" type="button" onclick="#">Valider</button>
+        <?php
+            }
+        ?>
     </div>
 </div>
 
