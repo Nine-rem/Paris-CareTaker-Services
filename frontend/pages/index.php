@@ -6,7 +6,7 @@
 <?php include "template/header.php";?>
 
 <!-- Hero -->
-<div id="hero" class="px-4 py-5 d-flex justify-content-start align-items-center hero-primary">
+<div id="hero-principal-image" class="px-4 py-5 d-flex justify-content-start align-items-center hero-primary hero-position">
     <div class="py-5 box-margin-left">
         <h1 class="display-5 fw-bold">Location saisonnière et <br>services exclusifs</h1>
         <p class="fs-5 mb-4">Réservez une expérience unique en un clic avec Paris Caretaker Services</p>

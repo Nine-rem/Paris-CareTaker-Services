@@ -6,7 +6,7 @@
 <?php include "template/header.php";?>
 
 <!-- Hero -->
-<div id="hero" class="px-4 py-5 d-flex justify-content-center align-items-center hero-secondary">
+<div id="hero-principal-image" class="px-4 py-5 d-flex justify-content-center align-items-center hero-secondary hero-position">
     <div class="py-5 box-margin-left">
         <h1 class="display-5 fw-bold">Demandes en attente</h1>
     </div>

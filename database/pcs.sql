@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : ven. 19 avr. 2024 à 13:09
+-- Généré le : dim. 21 avr. 2024 à 12:33
 -- Version du serveur : 8.0.33
 -- Version de PHP : 8.2.13
 
@@ -408,16 +408,20 @@ CREATE TABLE IF NOT EXISTS `pcs_photo` (
   `description_photo` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `chemin_photo` varchar(320) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `piece_photo` smallint UNSIGNED NOT NULL,
+  `est_couverture` tinyint NOT NULL,
   PRIMARY KEY (`id_photo`),
   KEY `piece` (`piece_photo`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `pcs_photo`
 --
 
-INSERT INTO `pcs_photo` (`id_photo`, `nom_photo`, `description_photo`, `chemin_photo`, `piece_photo`) VALUES
-(1, 'salon1', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', '/salon1.jpg', 11);
+INSERT INTO `pcs_photo` (`id_photo`, `nom_photo`, `description_photo`, `chemin_photo`, `piece_photo`, `est_couverture`) VALUES
+(1, 'salon1', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', '/salon1.jpg', 11, 1),
+(2, 'chambre1', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', '/chambre1.jpg', 13, 0),
+(3, 'cuisine1', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', '/cuisine1.jpg', 12, 0),
+(4, 'sdb1', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', '/sdb1.jpg', 14, 0);
 
 -- --------------------------------------------------------
 
@@ -517,6 +521,7 @@ CREATE TABLE IF NOT EXISTS `pcs_service_reserve` (
 
 DROP TABLE IF EXISTS `pcs_service_souscrit`;
 CREATE TABLE IF NOT EXISTS `pcs_service_souscrit` (
+  `statut_souscription` tinyint UNSIGNED NOT NULL,
   `service_souscrit` smallint UNSIGNED NOT NULL,
   `bien_souscripteur` smallint UNSIGNED NOT NULL,
   `duree_souscription` tinyint UNSIGNED NOT NULL,
