@@ -124,6 +124,12 @@ h3, .bold-brown-text {
     font-weight: 600;
 }
 
+.black-h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: black;
+}
+
 .box-margin-left {
     padding-left: 0% !important;
 }
@@ -163,10 +169,6 @@ h3, .bold-brown-text {
 }
 
 /* -------------- Stay -------------- */
-#stay-gallery {
-    padding-top: 0% !important;   
-}
-
 .small-italic-text {
     font-style: italic;
     font-size: 13px;
