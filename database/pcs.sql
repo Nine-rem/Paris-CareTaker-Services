@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : ven. 19 avr. 2024 à 13:09
+-- Généré le : dim. 21 avr. 2024 à 10:22
 -- Version du serveur : 8.0.33
 -- Version de PHP : 8.2.13
 
@@ -517,6 +517,7 @@ CREATE TABLE IF NOT EXISTS `pcs_service_reserve` (
 
 DROP TABLE IF EXISTS `pcs_service_souscrit`;
 CREATE TABLE IF NOT EXISTS `pcs_service_souscrit` (
+  `statut_souscription` tinyint UNSIGNED NOT NULL,
   `service_souscrit` smallint UNSIGNED NOT NULL,
   `bien_souscripteur` smallint UNSIGNED NOT NULL,
   `duree_souscription` tinyint UNSIGNED NOT NULL,

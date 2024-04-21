@@ -35,9 +35,21 @@ app.get('/bien/:id', (req, res) => {
 // Extraction des équipements d'un bien
 app.get('/bien-equipement/:id', (req, res) => {
   const id = req.params.id;
-  connection.query('SELECT nom, pcs_equipement.id FROM pcs_bien_possede, pcs_equipement WHERE bien = ? and equipement = pcs_equipement.id', [id], (err, results) => {
+  connection.query('SELECT nom_equipement, id_equipement FROM pcs_bien_possede, pcs_equipement WHERE bien_equipe = ? AND equipement_contenu = id_equipement', [id], (err, results) => {
     if (err) {
       res.status(500).json({ error: 'Erreur lors de la récupération des équipements du bien' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// Extraction des services souscrit pour un bien
+app.get('/bien-service/:id', (req, res) => {
+  const id = req.params.id;
+  connection.query('SELECT nom_service, id_service FROM pcs_service_souscrit, pcs_service WHERE bien_souscripteur = ? AND service_souscrit = id_service AND statut_souscription = 1', [id], (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Erreur lors de la récupération des services souscrits pour le bien' });
     } else {
       res.status(200).json(results);
     }
