@@ -118,7 +118,7 @@ h1 {
     color: black;
 }
 
-h3 {
+h3, .bold-brown-text {
     color: #AF7357;
     font-size: 1rem;
     font-weight: 600;
@@ -129,11 +129,15 @@ h3 {
 }
 
 /* -------------- Hero -------------- */
-#hero {
+#hero-principal-image {
     background-image: url("assets/images/chambre-hotel-tropical-transparent.jpg");
+}
+
+.hero-position {
     background-position: center;
     background-size: cover;
 }
+
 .hero-primary {
     height: 500px;
 }
@@ -159,7 +163,15 @@ h3 {
 }
 
 /* -------------- Stay -------------- */
+#stay-gallery {
+    padding-top: 0% !important;   
+}
+
 .small-italic-text {
     font-style: italic;
     font-size: 13px;
+}
+
+.white-75 {
+    background-color: rgba(255, 255, 255, 0.75);
 }

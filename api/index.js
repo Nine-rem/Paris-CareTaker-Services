@@ -20,7 +20,7 @@ app.get('/bien', (req, res) => {
   });
 });
 
-// Extraction d'un bien
+// Extraction des informations d'un bien
 app.get('/bien/:id', (req, res) => {
   const id = req.params.id;
   connection.query('SELECT * FROM pcs_bien, pcs_utilisateur WHERE id_utilisateur = bailleur AND id_bien = ?', [id], (err, results) => {
@@ -50,6 +50,18 @@ app.get('/bien-service/:id', (req, res) => {
   connection.query('SELECT nom_service, id_service FROM pcs_service_souscrit, pcs_service WHERE bien_souscripteur = ? AND service_souscrit = id_service AND statut_souscription = 1', [id], (err, results) => {
     if (err) {
       res.status(500).json({ error: 'Erreur lors de la récupération des services souscrits pour le bien' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// Extraction des pièces d'un bien
+app.get('/bien-photo/:id', (req, res) => {
+  const id = req.params.id;
+  connection.query('SELECT * FROM pcs_piece, pcs_photo, pcs_type_piece WHERE bien_piece = ? AND piece_photo = id_piece AND id_type_piece = type_piece', [id], (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Erreur lors de la récupération des pièces du bien' });
     } else {
       res.status(200).json(results);
     }
