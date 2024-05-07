@@ -6,6 +6,8 @@ npm install nodejs
 
 npm install nodemon
 
+npm install express mysql body-parser bcryptjs jsonwebtoken
+
 nodemon index.js
 
 
