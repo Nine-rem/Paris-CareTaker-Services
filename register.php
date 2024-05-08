@@ -1,5 +1,3 @@
-<?php include "template/header.php";?>
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -128,5 +126,3 @@
     </script>
   </body>
 </html>
-
-<?php include "template/footer.php";?>

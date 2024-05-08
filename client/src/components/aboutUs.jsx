@@ -1,10 +1,12 @@
 import React from 'react';
 
+import equipePcs from '../assets/images/equipe-pcs.jpg';
+
 function AboutUs() {
   return (
     <div id="services" className="box lightgrey-box row vertical-align">
       <div className="col-md-6 align-self-center box-margin-right">
-        <img src="../assets/images/equipe-pcs.jpg" className="img-fluid" width="650px" alt="Équipe PCS"/>
+        <img src={equipePcs} className="img-fluid" width="650px" alt="Équipe PCS"/>
       </div>
       <div className="col-md-6">
         <h2>Qui sommes-nous ?</h2>

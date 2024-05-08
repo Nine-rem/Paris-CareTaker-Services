@@ -14,6 +14,7 @@ import Head from './components/head';
 
 function App() {
   return (
+    <>
     <div>
       <Head/>
       <Header />
@@ -24,10 +25,8 @@ function App() {
       <QuoteRequest />
       <ServiceProviders />
       <Footer />
-
-      
-      
     </div>
+    </>
   );
 }
 
