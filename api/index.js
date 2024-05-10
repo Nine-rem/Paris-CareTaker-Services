@@ -2,9 +2,133 @@ const express = require('express')
 const app = express()
 const connection = require('./db-connection.js');
 
+const cors = require('cors')
+app.use(express.json());
+app.use(cors({
+  credentials: true,
+  origin: 'http://localhost:5173'
+}))
 app.use(express.json())
 
 
+/* ----------------------------------------------------------
+      Gestion des utilisateurs
+---------------------------------------------------------- */
+// Chiffrage du mot de passe
+const bcrypt = require('bcryptjs');
+
+//inscription de l'utilisateur
+app.post("/register", async (req, res) => {
+  const {
+    lastName: nom_utilisateur,
+    firstName: prenom_utilisateur,
+    birthdate: naissance_utilisateur,
+    address: adresse_utilisateur,
+    postalCode: cp_utilisateur,
+    city: ville_utilisateur,
+    email: email_utilisateur,
+    password,
+    confirmPassword,
+    siret: SIRET_utilisateur,
+    phoneNumber: tel_utilisateur,
+    role,
+    company: societe_utilisateur
+  } = req.body;
+
+  let est_bailleur = 0, est_prestataire = 0;
+
+  if (role === 'landlord') {
+    est_bailleur = 1;
+  } else if (role === 'serviceProvider') {
+    est_prestataire = 1;
+  }
+  
+  console.log(password, confirmPassword)
+  const saltRounds = 10;
+  if(confirmPassword !== password) {
+    return res.status(400).json({ confirmPassword, password, message: 'Passwords do not match'});
+  }
+
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const query = `
+      INSERT INTO pcs_utilisateur (
+          societe_utilisateur,
+          SIRET_utilisateur,
+          nom_utilisateur,
+          prenom_utilisateur,
+          naissance_utilisateur,
+          adresse_utilisateur,
+          cp_utilisateur,
+          ville_utilisateur,
+          tel_utilisateur,
+          email_utilisateur,
+          pwd,
+          formule_utilisateur,
+          langue_utilisateur,
+          date_creation_utilisateur,
+          date_maj_utilisateur,
+          derniere_connexion_utilisateur,
+          est_admin,
+          est_bailleur,
+          est_prestataire,
+          est_banni,
+          token
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0 ,1, NOW(), NOW(), NOW(), 0, ?, ?, 0, NULL);
+    `;
+
+    const values = [
+      societe_utilisateur,
+      SIRET_utilisateur,
+      nom_utilisateur,
+      prenom_utilisateur,
+      naissance_utilisateur,
+      adresse_utilisateur,
+      cp_utilisateur,
+      ville_utilisateur,
+      tel_utilisateur,
+      email_utilisateur,
+      hashedPassword,
+      est_bailleur,
+      est_prestataire
+    ];
+    connection.execute(query, values, (error, results) => {
+      if (error) {
+        throw error;
+      }
+      res.json({ message: 'User successfully registered!', userId: results.insertId });
+    });
+
+  } catch (error) {
+    console.error('Error during registration:', error);
+    res.status(500).json({ message: 'An error occurred during user registration.', error: error.message });
+  }
+});
+
+
+
+//connexion de l'utilisateur
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  connection.query('SELECT id_utilisateur, email_utilisateur,pwd FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
+    if (error) {
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    const hashedPassword = results[0].pwd;
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    res.json({ message: 'User successfully logged in!', userId: results[0].id_utilisateur });
+  }
+  );
+});
 /* ----------------------------------------------------------
       Gestion des biens
 ---------------------------------------------------------- */

@@ -2,12 +2,13 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-const logo = require('../assets/logos/icon_dark.png');
-
+import iconDark from '../assets/logos/icon_dark.png';
+import titleDark from '../assets/logos/title_dark.png';
+import { Link } from 'react-router-dom';
 
 function Header() {
     return (
-        <>
+    <>
     <header>
         <div className="row p-3 d-flex justify-content-center align-items-center">
             <div className="col-2">
@@ -17,10 +18,10 @@ function Header() {
                 <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarLight">
                     <span className="navbar-toggler-icon"></span>
                 </button>
-                <div className="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbarLight">
+                <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbarLight">
                     <div className="offcanvas-header">
                     {/* <!-- Image du menu --> */}
-                    <img src={logo} alt="Icon" className="img-fluid" width="50px"></img>
+                    <img src={iconDark} alt="Icon" className="img-fluid" width="50px"></img>
                     <button type="button" className="btn-close" data-bs-dismiss="offcanvas"></button>
                     </div>
                     <div className="offcanvas-body">
@@ -108,12 +109,12 @@ function Header() {
             </div>
             <div className="col text-center">
             {/* <!-- Titre --> */}
-            <img src="../assets/logos/title_dark.png" width="200px"></img>
+            <img src={titleDark} width="200px"></img>
             </div>
             <div className="col-2 text-end d-none d-md-block">
             {/* <!-- Bouton de connexion/inscription --> */}
-            <button type="button" className="btn btn-dark">Connexion</button>
-            <button type="button" className="btn btn-dark">Inscription</button>
+            <Link to={"login"}><button type="button" className="btn btn-dark">Connexion</button></Link>
+            <Link to={"register"}><button type="button" className="btn btn-dark">Inscription</button></Link>
             </div>
         </div>
         {/* <!-- Séparateur --> */}

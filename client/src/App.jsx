@@ -1,32 +1,24 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './style.css';
-import Hero from './components/hero';
-import NewStays from './components/newStays';
-import AboutUs from './components/aboutUs';
-import Reviews from './components/reviews';
-import QuoteRequest from './components/quoteRequest';
-import ServiceProviders from './components/serviceProviders';
-import Footer from './components/footer';
-import Header from './components/header';
-import Head from './components/head';
+import { Route, Routes } from 'react-router-dom';
 
+import IndexPage from './pages/indexPage.jsx';
+import LoginPage from './pages/loginPage.jsx';
+import RegisterPage from './pages/registerPage.jsx';
+import Layout from './layout.jsx';
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://localhost:5000';
 
 function App() {
   return (
-    <>
-    <div>
-      <Head/>
-      <Header />
-      <Hero />
-      <NewStays />
-      <AboutUs />
-      <Reviews />
-      <QuoteRequest />
-      <ServiceProviders />
-      <Footer />
-    </div>
-    </>
+    <Routes>
+      <Route ptah ="/" element={<Layout/>}>
+      <Route index element={<IndexPage/>} />
+      <Route path="/login" element={<LoginPage/>} />
+      <Route path="/register" element={<RegisterPage/>} />
+      </Route>
+    </Routes>
+
   );
 }
 
