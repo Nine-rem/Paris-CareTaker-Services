@@ -10,6 +10,7 @@ app.use(cors({
 }))
 app.use(express.json())
 
+const auth = require('./auth.js');
 
 /* ----------------------------------------------------------
       Gestion des utilisateurs
@@ -36,49 +37,79 @@ app.post("/register", async (req, res) => {
   } = req.body;
 
   let est_bailleur = 0, est_prestataire = 0;
-
   if (role === 'landlord') {
     est_bailleur = 1;
   } else if (role === 'serviceProvider') {
     est_prestataire = 1;
   }
   
-  console.log(password, confirmPassword)
   const saltRounds = 10;
-  if(confirmPassword !== password) {
-    return res.status(400).json({ confirmPassword, password, message: 'Passwords do not match'});
+  if (confirmPassword !== password) {
+    return res.status(400).json({ message: 'Les mots de passes ne correspondent pas' });
   }
 
-
+  
+  
+  
   try {
+    const [results] = await connection.promise().query('SELECT email_utilisateur FROM pcs_utilisateur WHERE email_utilisateur = ?', [email_utilisateur]);
+    if (results.length > 0) {
+      return res.status(409).json({ message: 'compte déjà existant' });
+    }
+    
+    //clean the email and verify if it is an email
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email_utilisateur)) {
+      return res.status(400).json({ message: 'Email invalide' });
+    }
+    
+    //clean phone number
+    const regexPhone = /^\+?\d{1,4}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+    if (!regexPhone.test(tel_utilisateur)) {
+      return res.status(400).json({ message: 'Numéro de téléphone invalide' });
+    }
+  
+    //clean name
+    const regexName = /^[a-zA-ZÀ-ÿ\s]{2,40}$/;
+    if (!regexName.test(nom_utilisateur) || !regexName.test(prenom_utilisateur)) {
+      return res.status(400).json({ message: 'Nom ou prénom invalide' });
+    }
+  
+    //verify password
+    const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    if (!regexPassword.test(password)) {
+      return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre' });
+    }
+
+    
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+    
     const query = `
-      INSERT INTO pcs_utilisateur (
-          societe_utilisateur,
-          SIRET_utilisateur,
-          nom_utilisateur,
-          prenom_utilisateur,
-          naissance_utilisateur,
-          adresse_utilisateur,
-          cp_utilisateur,
-          ville_utilisateur,
-          tel_utilisateur,
-          email_utilisateur,
-          pwd,
-          formule_utilisateur,
-          langue_utilisateur,
-          date_creation_utilisateur,
-          date_maj_utilisateur,
-          derniere_connexion_utilisateur,
-          est_admin,
-          est_bailleur,
-          est_prestataire,
-          est_banni,
-          token
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0 ,1, NOW(), NOW(), NOW(), 0, ?, ?, 0, NULL);
+    INSERT INTO pcs_utilisateur (
+      societe_utilisateur,
+      SIRET_utilisateur,
+        nom_utilisateur,
+        prenom_utilisateur,
+        naissance_utilisateur,
+        adresse_utilisateur,
+        cp_utilisateur,
+        ville_utilisateur,
+        tel_utilisateur,
+        email_utilisateur,
+        pwd,
+        formule_utilisateur,
+        langue_utilisateur,
+        date_creation_utilisateur,
+        date_maj_utilisateur,
+        derniere_connexion_utilisateur,
+        est_admin,
+        est_bailleur,
+        est_prestataire,
+        est_banni,
+        token
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, NOW(), NOW(), NOW(), 0, ?, ?, 0, NULL);
     `;
-
+    
     const values = [
       societe_utilisateur,
       SIRET_utilisateur,
@@ -94,41 +125,58 @@ app.post("/register", async (req, res) => {
       est_bailleur,
       est_prestataire
     ];
-    connection.execute(query, values, (error, results) => {
-      if (error) {
-        throw error;
-      }
-      res.json({ message: 'User successfully registered!', userId: results.insertId });
-    });
 
+    const [insertResult] = await connection.promise().execute(query, values);
+    res.json({ message: 'Inscrit!', userId: insertResult.insertId });
   } catch (error) {
-    console.error('Error during registration:', error);
-    res.status(500).json({ message: 'An error occurred during user registration.', error: error.message });
+    console.error('Error:', error);
+    res.status(500).json({ message: 'un erreur est survenue.', error: error.message });
   }
 });
 
 
+//token
 
 //connexion de l'utilisateur
 
+const jwt = require('jsonwebtoken');
+const secretKey = "pa2024";
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  connection.query('SELECT id_utilisateur, email_utilisateur,pwd FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
+  
+  connection.query('SELECT id_utilisateur, email_utilisateur, pwd FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
     if (error) {
-      return res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json({ message: 'Erreur de serveur' });
     }
     if (results.length === 0) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
+
     const hashedPassword = results[0].pwd;
-    const isMatch = await bcrypt.compare(password, hashedPassword);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    const isMatchingPassword = await bcrypt.compare(password, hashedPassword);
+
+    if (!isMatchingPassword) {
+      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
-    res.json({ message: 'User successfully logged in!', userId: results[0].id_utilisateur });
-  }
-  );
+
+    const userId = results[0].id_utilisateur;
+    const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
+
+    connection.query(
+      'UPDATE pcs_utilisateur SET token = ? WHERE id_utilisateur = ?',
+      [token, userId],
+      (updateError) => {
+        if (updateError) {
+          return res.status(500).json({ message: 'Erreur lors de la mise à jour du token' });
+        }
+
+        res.json({ message: 'Connecté', token, userId });
+      }
+    );
+  });
 });
+
 /* ----------------------------------------------------------
       Gestion des biens
 ---------------------------------------------------------- */
