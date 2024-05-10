@@ -20,9 +20,12 @@ export default function RegisterPage() {
     const [phoneNumber, setphoneNumber] = useState("");
     const [role, setRole] = useState("");
     const [company, setCompany] = useState("");
-    function registerUser(ev) {
+    const [error, setError] = useState("");
+    async function registerUser(ev) {
         ev.preventDefault();
-        axios.post ('/register', {
+        setError("");
+        try{
+            const response = await axios.post ('/register', {
             lastName,
             firstName,
             birthdate,
@@ -36,9 +39,18 @@ export default function RegisterPage() {
             phoneNumber,
             role,
             company
-        })
+        });
 
+        console.log('Utilisateur inscrit:', response.data.message);
+    } catch (error) {
+        console.error('Erreur lors de l\'inscription:', error);
+        if (error.response) {
+            setError(error.response.data.message);
+        } else {
+            setError('Une erreur s\'est produite');
+        }
     }
+}
 
     const handleRoleChange = (event) => {
         setRole(event.target.value);
@@ -50,7 +62,7 @@ export default function RegisterPage() {
         <div id = "register" className="d-flex justify-content-center align-items-center">
             <div id="signup" className="box w-80">
                 <h1 className="text-4xl text-center mb-4">Inscription</h1>
-
+                {error && <p className="text-danger">{error}</p>}
                 <Form onSubmit={registerUser}>
                     {/* Champ Nom */}
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextLastName">

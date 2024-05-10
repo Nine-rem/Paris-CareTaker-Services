@@ -10,34 +10,36 @@ import { useState } from 'react';
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     async function handleLoginSubmit(ev) {
         ev.preventDefault();
-        axios.post('/login', {
-            email: email,
-            password: password
-        })
-        .then((response) => {
-            console.log(response);
-        }
-        )
-        .catch((error) => {
-            console.error('Error during login:', error);
-        });
-    }
+        setError(""); // Réinitialisez les erreurs avant une nouvelle tentative
 
+        try {
+            const response = await axios.post('/login', {
+                email: email,
+                password: password
+            });
+
+        } catch (err) {
+
+            const errorMessage = err.response.data.message || "Une erreur est survenue";
+            setError(errorMessage); 
+        }
+    }
     return (
         <>
             <div id="login" className="container">
                 <div className="box centered-text">
                     <h1 className="text-4xl text-center">Connexion</h1>
-
+                    {error && <div className="alert alert-danger">{error}</div>}
                     <Form onSubmit={handleLoginSubmit} >
                         <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
                             <Form.Label column sm="2">
                                 Email
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control type="email" placeholder="votre@email.com" 
+                                <Form.Control type="email" placeholder="votre@email.com" required = "required"
                                 value={email}$
                                 onChange={(ev) => setEmail(ev.target.value)}
                                 />
@@ -49,7 +51,7 @@ export default function LoginPage() {
                                 Mot de passe
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control type="password" placeholder="Mot de passe" 
+                                <Form.Control type="password" placeholder="Mot de passe" required = "required"
                                 value={password}
                                 onChange={(ev) => setPassword(ev.target.value)}
                                 />
