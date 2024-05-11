@@ -143,7 +143,18 @@ const jwt = require('jsonwebtoken');
 const secretKey = "pa2024";
 
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+ 
+  let { email, password } = req.body;
+
+
+  email = email.trim().toLowerCase();
+
+  const emailRegex = /\S+@\S+\.\S+/;
+
+
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: 'Email invalide' });
+  }
   
   connection.query('SELECT id_utilisateur, email_utilisateur, pwd FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
     if (error) {
@@ -161,7 +172,8 @@ app.post('/login', async (req, res) => {
     }
 
     const userId = results[0].id_utilisateur;
-    const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
+    const token = jwt.sign({ userId,email }, secretKey, { expiresIn: '1h' });
+    res.cookie('token', token, { httpOnly: true });
 
     connection.query(
       'UPDATE pcs_utilisateur SET token = ? WHERE id_utilisateur = ?',
