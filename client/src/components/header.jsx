@@ -21,7 +21,7 @@ function Header() {
                 <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbarLight">
                     <div className="offcanvas-header">
                     {/* <!-- Image du menu --> */}
-                    <img src={iconDark} alt="Icon" className="img-fluid" width="50px"></img>
+                    <Link to="/"><img src={iconDark} alt="Icon" className="img-fluid" width="50px"></img></Link>
                     <button type="button" className="btn-close" data-bs-dismiss="offcanvas"></button>
                     </div>
                     <div className="offcanvas-body">
@@ -109,7 +109,9 @@ function Header() {
             </div>
             <div className="col text-center">
             {/* <!-- Titre --> */}
+            <Link to="/">
             <img src={titleDark} width="200px"></img>
+            </Link>
             </div>
             <div className="col-2 text-end d-none d-md-block">
             {/* <!-- Bouton de connexion/inscription --> */}
