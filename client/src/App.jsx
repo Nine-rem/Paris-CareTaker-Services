@@ -14,8 +14,9 @@ import ContactPage from './pages/contactPage.jsx';
 import Layout from './layout.jsx';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:5000';
 
+axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.withCredentials = true;
 function App() {
   return (
     <Routes>
