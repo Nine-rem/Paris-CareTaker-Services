@@ -19,7 +19,9 @@ export default function LoginPage() {
             const response = await axios.post('/login', {
                 email: email,
                 password: password
-            });
+            },
+            {withCredentials: true}
+            );
 
         } catch (err) {
 
