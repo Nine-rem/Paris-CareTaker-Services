@@ -13,11 +13,11 @@ axios.defaults.baseURL = 'http://localhost:5000';
 function App() {
   return (
     <Routes>
-      <Route ptah ="/" element={<Layout/>}>
-      <Route index element={<IndexPage/>} />
-      <Route path="/login" element={<LoginPage/>} />
-      <Route path="/register" element={<RegisterPage/>} />
-      <Route path="/stayAll" element={<StayAll/>} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<IndexPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="stayAll" element={<StayAll />} />
       </Route>
     </Routes>
 

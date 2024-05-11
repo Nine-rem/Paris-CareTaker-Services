@@ -6,7 +6,7 @@ import AboutUs from '../components/aboutUs';
 import Reviews from '../components/reviews';
 import QuoteRequest from '../components/quoteRequest';
 import ServiceProviders from '../components/serviceProviders';
-import Footer from '../components/footer';
+
 import Head from '../components/head';
 
 export default function IndexPage() {
@@ -20,7 +20,7 @@ export default function IndexPage() {
       <Reviews />
       <QuoteRequest />
       <ServiceProviders />
-      <Footer />
+
     </div>
     </>
   );
