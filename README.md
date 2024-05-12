@@ -1,23 +1,28 @@
 Pour utiliser nodejs
 
-Installer npm
+1)Installer npm
 
-npm install nodejs
+2)npm install yarn
 
-npm install nodemon
 
-npm install express mysql body-parser bcryptjs jsonwebtoken
+Paquets a installer dans api
+
+1)npm install nodejs
+
+2)npm install nodemon
+
+3)npm install express mysql body-parser bcryptjs jsonwebtoken
+
+4)npm install cookie-parser
+
+
+Pour mettre en route l'api
 
 nodemon index.js
 
 
 Pour utiliser react
 
-npm install yarn
-
-yarn add bootstrap@5.1.3
+yarn add bootstrap
 
 yarn dev 
-
-
-
