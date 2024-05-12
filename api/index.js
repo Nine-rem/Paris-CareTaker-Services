@@ -221,8 +221,8 @@ app.get('/profile', (req, res) => {
   }
 });
 
-app.get('/logout', (req, res) => {
-  res.clearCookie('token');
+app.post('/logout', (req, res) => {
+  res.cookie('token', '').json(true)
   res.json({ message: 'Déconnecté' });
 });
 
