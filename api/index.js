@@ -1,20 +1,31 @@
+/* ----------------------------------------------------------
+Définition des constantes 
+---------------------------------------------------------- */
+
+
 const express = require('express')
 const app = express()
 const connection = require('./db-connection.js');
-
 const cors = require('cors')
+const jwt = require('jsonwebtoken');
+const secretKey = "pa2024";
+const cookieParser = require('cookie-parser');
+
 app.use(express.json());
 app.use(cors({
   credentials: true,
   origin: 'http://localhost:5173'
 }))
 app.use(express.json())
-
+ 
+app.use(cookieParser());
+//a mettre dans le chemin nécessitant une authentification
 const auth = require('./auth.js');
 
 /* ----------------------------------------------------------
       Gestion des utilisateurs
 ---------------------------------------------------------- */
+
 // Chiffrage du mot de passe
 const bcrypt = require('bcryptjs');
 
@@ -71,6 +82,9 @@ app.post("/register", async (req, res) => {
   
     //clean name
     const regexName = /^[a-zA-ZÀ-ÿ\s]{2,40}$/;
+    nom_utilisateur = nom_utilisateur.trim().toUpperCase();
+    prenom_utilisateur = prenom_utilisateur.trim().toLowerCase();
+    prenom_utilisateur = prenom_utilisateur.charAt(0).toUpperCase() + prenom_utilisateur.slice(1);
     if (!regexName.test(nom_utilisateur) || !regexName.test(prenom_utilisateur)) {
       return res.status(400).json({ message: 'Nom ou prénom invalide' });
     }
@@ -135,12 +149,10 @@ app.post("/register", async (req, res) => {
 });
 
 
-//token
+
 
 //connexion de l'utilisateur
 
-const jwt = require('jsonwebtoken');
-const secretKey = "pa2024";
 
 app.post('/login', async (req, res) => {
  
@@ -156,7 +168,7 @@ app.post('/login', async (req, res) => {
     return res.status(400).json({ message: 'Email invalide' });
   }
   
-  connection.query('SELECT id_utilisateur, email_utilisateur, pwd FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
+  connection.query('SELECT id_utilisateur, email_utilisateur, pwd, nom_utilisateur, prenom_utilisateur FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
     if (error) {
       return res.status(500).json({ message: 'Erreur de serveur' });
     }
@@ -170,9 +182,12 @@ app.post('/login', async (req, res) => {
     if (!isMatchingPassword) {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
-
+    
     const userId = results[0].id_utilisateur;
-    const token = jwt.sign({ userId,email }, secretKey, { expiresIn: '1h' });
+    const email = results[0].email_utilisateur;
+    const firstName = results[0].prenom_utilisateur;
+    const lastName = results[0].nom_utilisateur;
+    const token = jwt.sign({ userId,email,firstName,lastName }, secretKey, { expiresIn: '1h' });
     res.cookie('token', token, { httpOnly: true });
 
     connection.query(
@@ -182,12 +197,57 @@ app.post('/login', async (req, res) => {
         if (updateError) {
           return res.status(500).json({ message: 'Erreur lors de la mise à jour du token' });
         }
+        console.log(email,firstName,lastName, token, userId);
 
-        res.json({ message: 'Connecté', token, userId });
+        res.json({ email,firstName,lastName, token, userId });
       }
     );
   });
 });
+
+//Profil de l'utilisateur
+
+app.get('/profile', (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+      jwt.verify(token, secretKey, (err, decoded) => {
+          if (err) {
+              throw err;
+          }
+          res.json({ userId: decoded.userId, email: decoded.email, firstName: decoded.firstName, lastName: decoded.lastName });
+      });
+  } else {
+      res.status(401).json({ message: 'Aucun token fourni' });
+  }
+});
+
+app.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.json({ message: 'Déconnecté' });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ----------------------------------------------------------
       Gestion des biens

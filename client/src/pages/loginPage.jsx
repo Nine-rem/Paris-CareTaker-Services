@@ -1,9 +1,11 @@
 import Button from 'react-bootstrap/Button';
-import React from "react";
+import {useContext,React} from "react";
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { UserContext } from '../userContext';
+
 import axios from 'axios';
 import { useState } from 'react';
 
@@ -11,23 +13,30 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [redirect, setRedirect] = useState(false);
+    const {setUser} = useContext(UserContext);
     async function handleLoginSubmit(ev) {
         ev.preventDefault();
-        setError(""); // Réinitialisez les erreurs avant une nouvelle tentative
+        setError("");
 
         try {
-            const response = await axios.post('/login', {
+            const {data} = await axios.post('/login', {
                 email: email,
                 password: password
             },
             {withCredentials: true}
             );
+            setUser(data);
+            setRedirect(true);
 
         } catch (err) {
 
-            const errorMessage = err.response.data.message || "Une erreur est survenue";
+            const errorMessage = err.response?.data?.message || "Une erreur est survenue";
             setError(errorMessage); 
         }
+    }
+    if (redirect) {
+        return <Navigate to = {"/"} />;
     }
     return (
         <>

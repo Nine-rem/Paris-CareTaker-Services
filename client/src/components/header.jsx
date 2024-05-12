@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import iconDark from '../assets/logos/icon_dark.png';
 import titleDark from '../assets/logos/title_dark.png';
 import { Link } from 'react-router-dom';
-
+import { UserContext } from '../userContext';
 function Header() {
+    const { user } = useContext(UserContext);
     return (
     <>
     <header>
@@ -114,10 +115,18 @@ function Header() {
             </Link>
             </div>
             <div className="col-2 text-end d-none d-md-block">
-            {/* <!-- Bouton de connexion/inscription --> */}
-            <Link to={"login"}><button type="button" className="btn btn-dark">Connexion</button></Link>
-            <Link to={"register"}><button type="button" className="btn btn-dark">Inscription</button></Link>
-            </div>
+            {!!user ? (
+                            <div>
+                                <Link to="/account"><span>{user.firstName} {user.lastName}!</span></Link>
+                                <Link to="/logout"><button type="button" className="btn btn-dark">Déconnexion</button></Link>
+                            </div>
+                        ) : (
+                            <>
+                                <Link to="/login"><button type="button" className="btn btn-dark">Connexion</button></Link>
+                                <Link to="/register"><button type="button" className="btn btn-dark">Inscription</button></Link>
+                            </>
+                        )}
+                    </div>
         </div>
         {/* <!-- Séparateur --> */}
         <div className="brown-separator"></div>
