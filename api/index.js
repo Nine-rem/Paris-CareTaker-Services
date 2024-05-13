@@ -96,7 +96,7 @@ app.post("/register", async (req, res) => {
     const currentYear = date.getFullYear();
     const birthdate = new Date(naissance_utilisateur);
     const birthYear = birthdate.getFullYear();
-    if (currentYear - birthYear > 99 || currentYear - birthYear < 18) {
+    if (currentYear - birthYear > 99 || currentYear - birthYear < 6) {
       return res.status(400).json({ message: 'Date de naissance invalide' });
     }
     //verify password

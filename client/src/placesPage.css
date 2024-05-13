@@ -5,3 +5,37 @@
 .link-no-underline {
     text-decoration: none;
 }
+
+.icon-sm {
+    width: 16px; 
+    height: 16px;
+    vertical-align: middle; 
+    margin-right: 4px; 
+}
+
+.text-gray-500 {
+    color: #6c757d;
+}
+
+.text-sm {
+    font-size: 0.875rem; 
+}
+
+.add-button {
+
+    font-weight: bold;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;     
+    padding: 2rem 2rem;
+}
+.svg-icon {
+    width: 24px;
+    height: 24px;
+    border: 10px;
+
+}
+
+
+
