@@ -31,9 +31,11 @@ const bcrypt = require('bcryptjs');
 
 //inscription de l'utilisateur
 app.post("/register", async (req, res) => {
-  const {
+  let {
     lastName: nom_utilisateur,
-    firstName: prenom_utilisateur,
+    firstName: prenom_utilisateur
+  } = req.body;
+  const {
     birthdate: naissance_utilisateur,
     address: adresse_utilisateur,
     postalCode: cp_utilisateur,
