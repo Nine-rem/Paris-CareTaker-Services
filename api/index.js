@@ -88,7 +88,15 @@ app.post("/register", async (req, res) => {
     if (!regexName.test(nom_utilisateur) || !regexName.test(prenom_utilisateur)) {
       return res.status(400).json({ message: 'Nom ou prénom invalide' });
     }
-  
+    
+    //verify birthdate less than 99 years
+    const date = new Date();
+    const currentYear = date.getFullYear();
+    const birthdate = new Date(naissance_utilisateur);
+    const birthYear = birthdate.getFullYear();
+    if (currentYear - birthYear > 99 || currentYear - birthYear < 18) {
+      return res.status(400).json({ message: 'Date de naissance invalide' });
+    }
     //verify password
     const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
     if (!regexPassword.test(password)) {
