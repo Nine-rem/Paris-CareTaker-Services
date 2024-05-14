@@ -10,7 +10,10 @@ const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const secretKey = "pa2024";
 const cookieParser = require('cookie-parser');
+const imageDownloader = require('image-downloader');
+const multer = require('multer');
 
+//middleware
 app.use(express.json());
 app.use(cors({
   credentials: true,
@@ -19,8 +22,7 @@ app.use(cors({
 app.use(express.json())
  
 app.use(cookieParser());
-//a mettre dans le chemin nécessitant une authentification
-const auth = require('./auth.js');
+app.use("/uploads",express.static(__dirname + '/uploads'));
 
 /* ----------------------------------------------------------
       Gestion des utilisateurs
@@ -253,15 +255,38 @@ app.post('/logout', (req, res) => {
 
 
 
-
-
-
-
-
-
 /* ----------------------------------------------------------
       Gestion des biens
 ---------------------------------------------------------- */
+//ajout d'un bien
+
+app.post("/upload-by-link", async(req, res) => {
+  const {link} = req.body;
+  const newName = "photo" + Date.now() + '.jpg';
+  await imageDownloader.image({
+    url:link,
+    dest: __dirname + '/uploads/' + newName,
+    
+  })
+  res.json(newName);
+
+
+
+})
+
+const photosMiddleware = multer({dest:"uploads"});
+app.post("/upload",photosMiddleware.array('photos',100) ,async (req, res) => {
+    res.json(req.files);
+
+
+
+});
+
+
+
+
+
+
 
 // Extraction de tous les biens
 app.get('/bien', (req, res) => {
