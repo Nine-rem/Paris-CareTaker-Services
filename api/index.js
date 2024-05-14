@@ -12,7 +12,7 @@ const secretKey = "pa2024";
 const cookieParser = require('cookie-parser');
 const imageDownloader = require('image-downloader');
 const multer = require('multer');
-
+const fs = require('fs');
 //middleware
 app.use(express.json());
 app.use(cors({
@@ -258,7 +258,7 @@ app.post('/logout', (req, res) => {
 /* ----------------------------------------------------------
       Gestion des biens
 ---------------------------------------------------------- */
-//ajout d'un bien
+//ajout d'une photo bien par lien
 
 app.post("/upload-by-link", async(req, res) => {
   const {link} = req.body;
@@ -271,20 +271,113 @@ app.post("/upload-by-link", async(req, res) => {
   res.json(newName);
 
 
-
 })
 
-const photosMiddleware = multer({dest:"uploads"});
+//ajout d'une photo bien par fichier
+const photosMiddleware = multer({dest:"uploads/"});
 app.post("/upload",photosMiddleware.array('photos',100) ,async (req, res) => {
-    res.json(req.files);
-
-
+  const uploadedFiles = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const {path, originalname} = req.files[i];
+    const parts = originalname.split(".");
+    const extension = parts[parts.length - 1];
+    const newPath = path + "." + extension;
+    fs.renameSync(path, newPath)
+    uploadedFiles.push(newPath.replace("uploads\\",""));
+    
+  }  
+  
+  res.json(uploadedFiles);
 
 });
 
+//suppression d'une photo
+app.delete("/upload/:filename", (req, res) => {
+  const {filename} = req.params;
+  fs.unlink(__dirname + "/uploads/" + filename, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Erreur lors de la suppression du fichier");
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
 
 
+app.post('/places', (req, res) => {
+  const {token} = req.cookies;
+  jwt.verify(token, secretKey, async (err, userData) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
 
+    const {
+      title: titre_bien,
+      address: adresse_bien,
+      zipcode: cp_bien,
+      city: ville_bien,
+      description: description_bien,
+      maxGuests: nb_max_personnes,
+      checkIn: heure_arrivee,
+      checkOut: heure_depart,
+      equipments: equipements,
+      additionalInfo: infos_supplementaires,  // Assuming this is optional and not stored
+      addedPhotos: photos,
+    } = req.body;
+    const id_utilisateur = userData.id_utilisateur;
+
+    const query = `
+    INSERT INTO pcs_bien (
+      titre_bien,
+      adresse_bien,
+      cp_bien,
+      ville_bien,
+      description_bien,
+      nb_max_personnes,
+      heure_arrivee,
+      heure_depart,
+      id_utilisateur
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    `;
+    const values = [
+      titre_bien,
+      adresse_bien,
+      cp_bien,
+      ville_bien,
+      description_bien,
+      nb_max_personnes,
+      heure_arrivee,
+      heure_depart,
+      id_utilisateur
+    ];
+    connection.query(query, values, async (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la création du bien' });
+      }
+      const id_bien = results.insertId;
+
+      const insertEquipements = `
+      INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
+      `;
+      for (let i = 0; i < equipements.length; i++) {
+        const equipement = equipements[i];
+        await connection.query(insertEquipements, [id_bien, equipement]);
+      }
+
+      const insertPhotos = `
+      INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
+      `;
+      for (let i = 0; i < photos.length; i++) {
+        const photo = photos[i];
+        await connection.query(insertPhotos, [photo, id_bien]);
+      }
+
+      res.json({ message: 'Bien créé', bienId: id_bien });
+    });
+  });
+});
 
 
 

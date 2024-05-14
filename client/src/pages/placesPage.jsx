@@ -1,9 +1,12 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import React, { useState } from "react";
 import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Alert from 'react-bootstrap/Alert';
 import './../placesPage.css';
-import Equipements from "../equipements";
+import Equipements from "./equipements";  
 import axios from "axios";
+import PhotoUploader from "./photoUploader";
 
 export default function PlacesPage() {
     const { action } = useParams();
@@ -14,21 +17,24 @@ export default function PlacesPage() {
     const [addedPhotos, setAddedPhotos] = useState([]);
     const [photoLink, setPhotoLink] = useState("");
     const [description, setDescription] = useState("");
-    const [equipments, setEquipments] = useState([]);
+    const [equipments, setEquipments] = useState([]);  
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [checkIn, setCheckIn] = useState("");
     const [checkOut, setCheckOut] = useState("");
     const [maxGuests, setMaxGuests] = useState("1");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [redirect, setRedirect] = useState('');
 
     function inputHeader(title) {
         return (
-            <h2 className="">{title}</h2>
+            <h2>{title}</h2>
         );
     }
 
     function inputDescription(description) {
         return (
-            <p className="text-muted small mt-4">{description}</p>
+            <p className="text-muted small mt-2">{description}</p>
         );
     }
 
@@ -41,30 +47,30 @@ export default function PlacesPage() {
         );
     }
 
-    function uploadPhoto(ev) {
-        const files = ev.target.files;
-        const data = new FormData();
-        data.set('photos', files);
-        axios.post('/upload', data, {
-            headers: {'content-type' : 'multipart/form-data'}
-        })
 
-        .then((response) => {
-            const{data} =response;
-            setAddedPhotos(prev => [...prev, ...data]);
-        })
-        .catch((error) => {
-            console.error("Erreur lors de l'envoi des photos :", error);
-        });
-    }
-
-
-    async function addPhotoByLink(ev) {
+    async function addNewPlace(ev) {
         ev.preventDefault();
-        const { data: filename } = await axios.post('/upload-by-link', { link: photoLink });
-        setAddedPhotos(prev => [...prev, filename]);
-        setPhotoLink(''); 
+            await axios.post('/places', {
+            title,
+            address,
+            zipcode,
+            city,
+            addedPhotos,
+            description,
+            equipments,
+            additionalInfo,
+            checkIn,
+            checkOut,
+            maxGuests
+        });
+        setRedirect('/account/places');
+        
+        if (redirect){
+            return <Navigate to={redirect} />;
+        }
+
     }
+
 
     return (
         <>
@@ -84,63 +90,68 @@ export default function PlacesPage() {
             )}
             {action === 'new' && (
                 <div className="container my-5">
-                    <form>
+                    <form onSubmit={addNewPlace}>
                         {preInput("Titre", "Ajoutez un nom à votre logement, il doit être court et concis")}
-                        <input type="text" value={title} onChange={ev => setTitle(ev.target.value)} placeholder="Nom du logement" className="form-control mb-3 mt-4"></input>
+                        <Form.Group className="mb-3">
+                            <Form.Control type="text" value={title} onChange={ev => setTitle(ev.target.value)} placeholder="Nom du logement" />
+                        </Form.Group>
                         <h2>Adresse</h2>
-                        <input type="text" value={address} onChange={ev => setAddress(ev.target.value)} placeholder="Adresse" className="form-control mb-3"></input>
-                        <input type="text" value={zipcode} onChange={ev => setZipcode(ev.target.value)} placeholder="Code postal" className="form-control mb-3"></input>
-                        <input type="text" value={city} onChange={ev => setCity(ev.target.value)} placeholder="Ville" className="form-control mb-3"></input>
+                        <Form.Group className="mb-3">
+                            <Form.Control type="text" value={address} onChange={ev => setAddress(ev.target.value)} placeholder="Adresse" />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Control type="text" value={zipcode} onChange={ev => setZipcode(ev.target.value)} placeholder="Code postal" />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Control type="text" value={city} onChange={ev => setCity(ev.target.value)} placeholder="Ville" />
+                        </Form.Group>
 
-                        <h2>Photos</h2>
-                        <div className="d-flex align-items-center">
-                            <input type="text" value={photoLink} onChange={ev => setPhotoLink(ev.target.value)} placeholder="URL de la photo" className="form-control me-3"></input>
-                            <Button variant="dark" onClick={addPhotoByLink}>Ajouter une photo</Button>
-                        </div>
-                        <div className="mt-3 photo-gallery">
-                            {addedPhotos.length > 0 && addedPhotos.map(link => (
-                                <div key={link}> 
-                                    <img className="custom-image" src={`http://localhost:5000/uploads/${link}`} alt="" />
-                                </div>
-                            ))}
-                        </div>
-                        <Button className="add-button" as="label" htmlFor="file-input" variant="outline-dark">
-                            <input id="file-input" type="file" className="d-none" onChange={uploadPhoto}/>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="svg-icon">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
-                            </svg>
-                            Importer des photos
-                        </Button>
+
+                        <PhotoUploader addedPhotos={addedPhotos} onChange={setAddedPhotos}/>
+
+
                         <h2>Description du logement</h2>
-                        <textarea placeholder="Description du logement" value={description} onChange={ev => setDescription(ev.target.value)} className="form-control mb-3"></textarea>
+                        <Form.Group className="mb-3">
+                            <Form.Control as="textarea" placeholder="Description du logement" value={description} onChange={ev => setDescription(ev.target.value)} />
+                        </Form.Group>
 
                         {preInput("Équipements", "Sélectionnez les équipements disponibles dans votre logement")}
                         <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
-                            <Equipements selected={equipments} OnChange={setEquipments} />
+                            <Equipements selected={equipments} onChange={setEquipments} />
                         </div>
 
                         <h2 className="text-2xl mt-4">Informations complémentaires</h2>
-                        <textarea placeholder="Informations complémentaires" value={additionalInfo} onChange={ev => setAdditionalInfo(ev.target.value)} className="form-control mb-3"></textarea>
+                        <Form.Group className="mb-3">
+                            <Form.Control as="textarea" placeholder="Informations complémentaires" value={additionalInfo} onChange={ev => setAdditionalInfo(ev.target.value)} />
+                        </Form.Group>
                         {preInput("Heure du Check-in et Check-out", "Indiquez les horaires d'arrivée et de départ de votre logement")}
 
                         <div className="d-flex gap-4">
                             <div>
                                 <h3>Check-in</h3>
-                                <input type="time" value={checkIn} onChange={ev => setCheckIn(ev.target.value)} className="form-control"></input>
+                                <Form.Group>
+                                    <Form.Control type="time" value={checkIn} onChange={ev => setCheckIn(ev.target.value)} />
+                                </Form.Group>
                             </div>
                             <div>
                                 <h3>Check-out</h3>
-                                <input type="time" value={checkOut} onChange={ev => setCheckOut(ev.target.value)} className="form-control"></input>
+                                <Form.Group>
+                                    <Form.Control type="time" value={checkOut} onChange={ev => setCheckOut(ev.target.value)} />
+                                </Form.Group>
                             </div>
                             <div>
                                 <h3>Nombre maximum de voyageurs</h3>
-                                <input type="text" value={maxGuests} onChange={ev => setMaxGuests(ev.target.value)} className="form-control"></input>
+                                <Form.Group>
+                                    <Form.Control type="text" value={maxGuests} onChange={ev => setMaxGuests(ev.target.value)} />
+                                </Form.Group>
                             </div>
                         </div>
                         <Button variant="dark" className="mt-4">Enregistrer</Button>
                     </form>
                 </div>
             )}
+            {errorMessage && <Alert variant="danger" className="mt-3">{errorMessage}</Alert>}
+            {successMessage && <Alert variant="success" className="mt-3">{successMessage}</Alert>}
         </>
     );
 }

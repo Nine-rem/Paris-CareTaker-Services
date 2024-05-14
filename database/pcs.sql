@@ -756,6 +756,15 @@ ALTER TABLE `pcs_utilisateur`
   ADD CONSTRAINT `pcs_utilisateur_ibfk_1` FOREIGN KEY (`langue_utilisateur`) REFERENCES `pcs_langue` (`id_langue`);
 COMMIT;
 
+--
+-- Modification des données de la table `pcs_bien`
+--
+ALTER TABLE pcs_bien
+ADD COLUMN nb_max_personnes INT NOT NULL,
+ADD COLUMN heure_arrivee TIME NOT NULL,
+ADD COLUMN heure_depart TIME NOT NULL;
+
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
