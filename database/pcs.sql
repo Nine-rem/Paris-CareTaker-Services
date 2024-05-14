@@ -762,7 +762,8 @@ COMMIT;
 ALTER TABLE pcs_bien
 ADD COLUMN nb_max_personnes INT NOT NULL,
 ADD COLUMN heure_arrivee TIME NOT NULL,
-ADD COLUMN heure_depart TIME NOT NULL;
+ADD COLUMN heure_depart TIME NOT NULL,
+ADD COLUMN information_supplementaire TEXT;
 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
