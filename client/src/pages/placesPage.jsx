@@ -146,7 +146,7 @@ export default function PlacesPage() {
                                 </Form.Group>
                             </div>
                         </div>
-                        <Button variant="dark" className="mt-4">Enregistrer</Button>
+                        <Button variant="dark" className="mt-4" type= 'submit'>Enregistrer</Button>
                     </form>
                 </div>
             )}

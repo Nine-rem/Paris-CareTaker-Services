@@ -304,16 +304,21 @@ app.delete("/upload/:filename", (req, res) => {
   });
 });
 
-
 app.post('/places', (req, res) => {
-  const {token} = req.cookies;
-  jwt.verify(token, secretKey, async (err, userData) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Token invalide' });
     }
 
+    const id_utilisateur = decoded.userId;
+
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+
     const {
-      title: titre_bien,
+      title: nom_bien,
       address: adresse_bien,
       zipcode: cp_bien,
       city: ville_bien,
@@ -322,26 +327,27 @@ app.post('/places', (req, res) => {
       checkIn: heure_arrivee,
       checkOut: heure_depart,
       equipments: equipements,
-      additionalInfo: infos_supplementaires,  // Assuming this is optional and not stored
+      additionalInfo: information_supplementaire,
       addedPhotos: photos,
     } = req.body;
-    const id_utilisateur = userData.id_utilisateur;
 
+    console.log(id_utilisateur);
     const query = `
-    INSERT INTO pcs_bien (
-      titre_bien,
-      adresse_bien,
-      cp_bien,
-      ville_bien,
-      description_bien,
-      nb_max_personnes,
-      heure_arrivee,
-      heure_depart,
-      id_utilisateur
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+      INSERT INTO pcs_bien (
+        nom_bien,
+        adresse_bien,
+        cp_bien,
+        ville_bien,
+        description_bien,
+        nb_max_personnes,
+        heure_arrivee,
+        heure_depart,
+        information_supplementaire,
+        bailleur
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const values = [
-      titre_bien,
+      nom_bien,
       adresse_bien,
       cp_bien,
       ville_bien,
@@ -349,36 +355,64 @@ app.post('/places', (req, res) => {
       nb_max_personnes,
       heure_arrivee,
       heure_depart,
-      id_utilisateur
+      information_supplementaire,
+      id_utilisateur  // Ajouté ici comme bailleur
     ];
-    connection.query(query, values, async (error, results) => {
+
+    connection.query(query, values, (error, results) => {
       if (error) {
         console.error(error);
         return res.status(500).json({ message: 'Erreur lors de la création du bien' });
       }
       const id_bien = results.insertId;
 
+      // Insertion des équipements
       const insertEquipements = `
-      INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
+        INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
       `;
-      for (let i = 0; i < equipements.length; i++) {
-        const equipement = equipements[i];
-        await connection.query(insertEquipements, [id_bien, equipement]);
-      }
+      const equipementQueries = equipements.map(equipement => {
+        return new Promise((resolve, reject) => {
+          connection.query(insertEquipements, [id_bien, equipement], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+      });
 
+      // Insertion des photos
       const insertPhotos = `
-      INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
+        INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
       `;
-      for (let i = 0; i < photos.length; i++) {
-        const photo = photos[i];
-        await connection.query(insertPhotos, [photo, id_bien]);
-      }
+      const photoQueries = photos.map(photo => {
+        return new Promise((resolve, reject) => {
+          connection.query(insertPhotos, [photo, id_bien], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+      });
 
-      res.json({ message: 'Bien créé', bienId: id_bien });
+      Promise.all([...equipementQueries, ...photoQueries])
+        .then(() => {
+          // Insertion dans la table associative pcs_bien_enregistre
+          const insertUserPlace = `
+            INSERT INTO pcs_bien_enregistre (utilisateur_enregistre, bien_enregistre) VALUES (?, ?);
+          `;
+          connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).json({ message: 'Erreur lors de l\'enregistrement du bien avec l\'utilisateur' });
+            }
+            res.json({ message: 'Bien créé', bienId: id_bien });
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          res.status(500).json({ message: 'Erreur lors de la création du bien' });
+        });
     });
   });
 });
-
 
 
 // Extraction de tous les biens
