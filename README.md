@@ -15,6 +15,8 @@ Paquets a installer dans api
 
 4)npm install cookie-parser
 
+5) yarn add image-downloader
+
 
 Pour mettre en route l'api
 
