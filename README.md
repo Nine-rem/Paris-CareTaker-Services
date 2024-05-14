@@ -15,9 +15,9 @@ Paquets a installer dans api
 
 4)npm install cookie-parser
 
-5) yarn add image-downloader
+5)yarn add image-downloader
 
-
+6)yarn add multer 
 Pour mettre en route l'api
 
 nodemon index.js
