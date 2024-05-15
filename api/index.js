@@ -209,7 +209,7 @@ app.post('/login', async (req, res) => {
         if (updateError) {
           return res.status(500).json({ message: 'Erreur lors de la mise à jour du token' });
         }
-        console.log(email,firstName,lastName, token, userId);
+        // console.log(email,firstName,lastName, token, userId);
 
         res.json({ email,firstName,lastName, token, userId });
       }
@@ -428,24 +428,81 @@ app.post('/places', (req, res) => {
 //extractions des biens de l'utilisateur
 app.get('/places', (req, res) => {
   const { token } = req.cookies;
+  const photos = [];
+  
+
   jwt.verify(token, secretKey, (err, decoded) => {
-    const id_utilisateur = decoded.userId;
     if (err) {
       return res.status(401).json({ message: 'Token invalide' });
     }
+
+    const id_utilisateur = decoded.userId;
+
+
     if (!id_utilisateur) {
       return res.status(401).json({ message: 'Utilisateur non connecté' });
     }
+
     connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (error, results) => {
       if (error) {
         console.error(error);
         return res.status(500).json({ message: 'Erreur lors de la récupération des biens' });
       }
+      
       res.json(results);
-    }
-    );
+    });
+    // connection.query('SELECT * FROM pcs_photo WHERE id_bien = ?', [id_utilisateur], (error, results) => {
+    //   if (error) {
+    //     console.error(error);
+    //     return res.status(500).json({ message: 'Erreur lors de la récupération des photos' });
+    //   }
+      
+    //   res.json(results);
+    // });
   });
 });
+
+app.get('/places/:id/photos', (req, res) => {
+  const { token } = req.cookies;
+  const bienId = req.params.id;
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+
+    const id_utilisateur = decoded.userId;
+
+
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    const query = `
+      SELECT 
+          p.nom_photo, 
+          p.description_photo, 
+          p.chemin_photo, 
+          p.est_couverture
+      FROM 
+          pcs_photo p
+      JOIN 
+          pcs_piece pc ON p.piece_photo = pc.id_piece
+      JOIN 
+          pcs_bien b ON pc.bien_piece = b.id_bien
+      WHERE 
+          b.id_bien = ?;
+    `;
+
+    connection.query(query, [bienId], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la récupération des photos' });
+      }
+      res.json(results);
+    });
+  });
+});
+
 
 // Extraction de tous les biens
 app.get('/bien', (req, res) => {
@@ -457,6 +514,11 @@ app.get('/bien', (req, res) => {
       }
   });
 });
+
+
+
+
+
 
 // Extraction des informations d'un bien
 app.get('/bien/:id', (req, res) => {

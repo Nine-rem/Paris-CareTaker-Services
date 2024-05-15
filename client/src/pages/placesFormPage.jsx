@@ -5,6 +5,8 @@ import Alert from 'react-bootstrap/Alert';
 import Equipements from "./equipements";
 import PhotoUploader from "./photoUploader";
 import axios from "axios";
+import AccountNav from "../accountNav";
+import { Navigate } from "react-router-dom";
 
 
 export default function PlacesFormPage() {
@@ -22,6 +24,7 @@ export default function PlacesFormPage() {
     const [maxGuests, setMaxGuests] = useState("1");
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [redirect, setRedirect] = useState(false);
 
 
     async function addNewPlace(ev) {
@@ -70,9 +73,13 @@ export default function PlacesFormPage() {
         );
     }
 
-
+    if (redirect) {
+        return <Navigate to="/account/places" />;
+    }
 
     return( 
+        <div>
+        <AccountNav />
         <div className="container my-5">
         <form onSubmit={addNewPlace}>
             {preInput("Titre", "Ajoutez un nom à votre logement, il doit être court et concis")}
@@ -132,6 +139,7 @@ export default function PlacesFormPage() {
         </form>
         {errorMessage && <Alert variant="danger" className="mt-3">{errorMessage}</Alert>}
         {successMessage && <Alert variant="success" className="mt-3">{successMessage}</Alert>}
+    </div>
     </div>
     );
 }
