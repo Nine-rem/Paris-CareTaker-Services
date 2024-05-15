@@ -343,8 +343,9 @@ app.post('/places', (req, res) => {
         heure_arrivee,
         heure_depart,
         information_supplementaire,
-        bailleur
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        bailleur,
+        agence_principale_bien
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,1);
     `;
     const values = [
       nom_bien,
@@ -356,28 +357,37 @@ app.post('/places', (req, res) => {
       heure_arrivee,
       heure_depart,
       information_supplementaire,
-      id_utilisateur  // Ajouté ici comme bailleur
+      id_utilisateur 
+
     ];
 
     connection.query(query, values, (error, results) => {
+
       if (error) {
         console.error(error);
         return res.status(500).json({ message: 'Erreur lors de la création du bien' });
       }
       const id_bien = results.insertId;
 
-      // Insertion des équipements
-      const insertEquipements = `
-        INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
-      `;
-      const equipementQueries = equipements.map(equipement => {
-        return new Promise((resolve, reject) => {
-          connection.query(insertEquipements, [id_bien, equipement], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-      });
+      // // Insertion des équipements
+      // const insertEquipements = `
+      //   INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
+      // `;
+      
+      // const equipementQueries = equipements.map(equipement => {
+      //   return new Promise((resolve, reject) => {
+      //     connection.query(insertEquipements, [id_bien, equipement], (err, results) => {
+      //       if (err) return reject(err);
+      //       resolve(results);
+      //     });
+      //   });
+      // });
+      
+    
+
+
+
+
 
       // Insertion des photos
       const insertPhotos = `
@@ -392,7 +402,8 @@ app.post('/places', (req, res) => {
         });
       });
 
-      Promise.all([...equipementQueries, ...photoQueries])
+      // Promise.all([...equipementQueries, ...photoQueries])
+      Promise.all([...photoQueries])
         .then(() => {
           // Insertion dans la table associative pcs_bien_enregistre
           const insertUserPlace = `
