@@ -391,7 +391,7 @@ app.post('/places', (req, res) => {
 
       // Insertion des photos
       const insertPhotos = `
-        INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
+      INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
       `;
       const photoQueries = photos.map(photo => {
         return new Promise((resolve, reject) => {
@@ -401,30 +401,51 @@ app.post('/places', (req, res) => {
           });
         });
       });
-
+      
       // Promise.all([...equipementQueries, ...photoQueries])
       Promise.all([...photoQueries])
-        .then(() => {
-          // Insertion dans la table associative pcs_bien_enregistre
-          const insertUserPlace = `
-            INSERT INTO pcs_bien_enregistre (utilisateur_enregistre, bien_enregistre) VALUES (?, ?);
-          `;
-          connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
-            if (err) {
-              console.error(err);
-              return res.status(500).json({ message: 'Erreur lors de l\'enregistrement du bien avec l\'utilisateur' });
-            }
-            res.json({ message: 'Bien créé', bienId: id_bien });
-          });
-        })
-        .catch(error => {
-          console.error(error);
-          res.status(500).json({ message: 'Erreur lors de la création du bien' });
+      .then(() => {
+        // Insertion dans la table associative pcs_bien_enregistre
+        const insertUserPlace = `
+        INSERT INTO pcs_bien_enregistre (utilisateur_enregistre, bien_enregistre) VALUES (?, ?);
+        `;
+        connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Erreur lors de l\'enregistrement du bien avec l\'utilisateur' });
+          }
+          res.json({ message: 'Bien créé', bienId: id_bien });
         });
+      })
+      .catch(error => {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur lors de la création du bien' });
+      });
     });
   });
 });
 
+//extractions des biens de l'utilisateur
+app.get('/places', (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
+    const id_utilisateur = decoded.userId;
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la récupération des biens' });
+      }
+      res.json(results);
+    }
+    );
+  });
+});
 
 // Extraction de tous les biens
 app.get('/bien', (req, res) => {
@@ -484,6 +505,7 @@ app.get('/bien-photo/:id', (req, res) => {
     }
   });
 });
+
 
 // Supression d'un bien
 // A FAIRE : vérifier si admin ou propriétaire
