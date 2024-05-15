@@ -1,6 +1,77 @@
-import React from "react";
+import {React, useState} from "react";
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Alert from 'react-bootstrap/Alert';
+import Equipements from "./equipements";
+import PhotoUploader from "./photoUploader";
+import axios from "axios";
+
 
 export default function PlacesFormPage() {
+
+    const [title, setTitle] = useState("");
+    const [address, setAddress] = useState("");
+    const [zipcode, setZipcode] = useState("");
+    const [city, setCity] = useState("");
+    const [addedPhotos, setAddedPhotos] = useState([]);
+    const [description, setDescription] = useState("");
+    const [equipments, setEquipments] = useState([]);  
+    const [additionalInfo, setAdditionalInfo] = useState("");
+    const [checkIn, setCheckIn] = useState("");
+    const [checkOut, setCheckOut] = useState("");
+    const [maxGuests, setMaxGuests] = useState("1");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+
+
+    async function addNewPlace(ev) {
+
+        ev.preventDefault();
+        try {
+            await axios.post('/places', {
+                title,
+                address,
+                zipcode,
+                city,
+                addedPhotos,
+                description,
+                equipments,
+                additionalInfo,
+                checkIn,
+                checkOut,
+                maxGuests
+            });
+            setSuccessMessage('Bien créé avec succès.');
+            setRedirect(true);
+        } catch (error) {
+            setErrorMessage('Erreur lors de la création du bien.');
+        }
+    }
+
+    
+    function inputHeader(title) {
+        return (
+            <h2>{title}</h2>
+        );
+    }
+
+    function inputDescription(description) {
+        return (
+            <p className="text-muted small mt-2">{description}</p>
+        );
+    }
+
+    function preInput(header, description) {
+        return (
+            <>
+                {inputHeader(header)}
+                {inputDescription(description)}
+            </>
+        );
+    }
+
+
+
     return( 
         <div className="container my-5">
         <form onSubmit={addNewPlace}>
