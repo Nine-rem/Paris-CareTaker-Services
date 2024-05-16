@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import pmr from '../assets/images/pmr.png';
 import animal from '../assets/images/animal.png';
 
@@ -6,7 +8,6 @@ export default function StayAll() {
     const [biens, setBiens] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
 
     useEffect(() => {
         fetch('http://localhost:5000/bien')
@@ -70,10 +71,15 @@ export default function StayAll() {
                                                 <td className="align-middle">{bien.capacite_bien}</td>
                                                 <td className="align-middle">{bien.surface_bien}m²</td>
                                                 <td className="align-middle">{bien.ville_bien} ({bien.cp_bien})</td>
+                                                <td className="align-middle">
+                                                    <Link to={`/account/places/${bien.id_bien}`}>
+                                                        <Button variant="primary">Voir</Button>
+                                                    </Link>
+                                                </td>
                                             </tr>
                                         ))
                                     ) : (
-                                        <tr><td colSpan="5">Aucune location trouvée.</td></tr>
+                                        <tr><td colSpan="7">Aucune location trouvée.</td></tr>
                                     )}
                                 </tbody>
                             </table>

@@ -30,6 +30,7 @@ app.use("/uploads",express.static(__dirname + '/uploads'));
 
 // Chiffrage du mot de passe
 const bcrypt = require('bcryptjs');
+const { error } = require('console');
 
 //inscription de l'utilisateur
 app.post("/register", async (req, res) => {
@@ -72,16 +73,17 @@ app.post("/register", async (req, res) => {
       return res.status(409).json({ message: 'compte déjà existant' });
     }
     
-    //clean the email and verify if it is an email
+    let errorArray = [];
+    
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(email_utilisateur)) {
-      return res.status(400).json({ message: 'Email invalide' });
+      errorArray.push('Email invalide');
     }
     
     //clean phone number
     const regexPhone = /^\+?\d{1,4}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
     if (!regexPhone.test(tel_utilisateur)) {
-      return res.status(400).json({ message: 'Numéro de téléphone invalide' });
+      errorArray.push('Numéro de téléphone invalide');
     }
   
     //clean name
@@ -90,7 +92,7 @@ app.post("/register", async (req, res) => {
     prenom_utilisateur = prenom_utilisateur.trim().toLowerCase();
     prenom_utilisateur = prenom_utilisateur.charAt(0).toUpperCase() + prenom_utilisateur.slice(1);
     if (!regexName.test(nom_utilisateur) || !regexName.test(prenom_utilisateur)) {
-      return res.status(400).json({ message: 'Nom ou prénom invalide' });
+      
     }
     
     //verify birthdate less than 99 years
@@ -107,6 +109,7 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre' });
     }
 
+    /* if err > 0 afficher les photo*/
     
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
@@ -209,7 +212,7 @@ app.post('/login', async (req, res) => {
         if (updateError) {
           return res.status(500).json({ message: 'Erreur lors de la mise à jour du token' });
         }
-        // console.log(email,firstName,lastName, token, userId);
+        console.log(email,firstName,lastName, token, userId);
 
         res.json({ email,firstName,lastName, token, userId });
       }
@@ -220,7 +223,11 @@ app.post('/login', async (req, res) => {
 //Profil de l'utilisateur
 
 app.get('/profile', (req, res) => {
-  const { token } = req.cookies;
+  // const { token } = req.cookies;
+  //token de 60 caractères
+  const {token} = req.cookies.token;
+  
+  console.log(token.length);
   if (token) {
       jwt.verify(token, secretKey, (err, decoded) => {
           if (err) {
@@ -235,6 +242,15 @@ app.get('/profile', (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.cookie('token', '').json(true)
+  connection.query('UPDATE pcs_utilisateur SET token = NULL WHERE token = ?',
+  [token],
+  (error) => {
+    if (error) {
+      return res.status(500).json({ message: 'Erreur lors de la déconnexion' });
+    }
+  });
+
+
   res.json({ message: 'Déconnecté' });
 });
 
@@ -262,6 +278,11 @@ app.post('/logout', (req, res) => {
 
 app.post("/upload-by-link", async(req, res) => {
   const {link} = req.body;
+  //vérifier si le lien est valide et se termine par .jpg, .jpeg, .png
+  const regex = /\.(jpg|jpeg|png)$/;
+  if (!regex.test(link)) {
+    return res.status(400).json({ message: 'Lien invalide' });
+  }
   const newName = "photo" + Date.now() + '.jpg';
   await imageDownloader.image({
     url:link,
@@ -281,6 +302,13 @@ app.post("/upload",photosMiddleware.array('photos',100) ,async (req, res) => {
     const {path, originalname} = req.files[i];
     const parts = originalname.split(".");
     const extension = parts[parts.length - 1];
+
+    //vérifier si le fichier est une image
+    if (!["jpg","jpeg","png"].includes(extension) && req.files[i].size > 5000000) {
+      fs.unlinkSync(path);
+      return res.status(400).json({ message: 'Fichier invalide' });
+    }
+
     const newPath = path + "." + extension;
     fs.renameSync(path, newPath)
     uploadedFiles.push(newPath.replace("uploads\\",""));
@@ -329,6 +357,8 @@ app.post('/places', (req, res) => {
       equipments: equipements,
       additionalInfo: information_supplementaire,
       addedPhotos: photos,
+      // photoDescription: description_photo
+
     } = req.body;
 
     console.log(id_utilisateur);
@@ -391,7 +421,7 @@ app.post('/places', (req, res) => {
 
       // Insertion des photos
       const insertPhotos = `
-      INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
+        INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
       `;
       const photoQueries = photos.map(photo => {
         return new Promise((resolve, reject) => {
@@ -401,104 +431,26 @@ app.post('/places', (req, res) => {
           });
         });
       });
-      
+
       // Promise.all([...equipementQueries, ...photoQueries])
       Promise.all([...photoQueries])
-      .then(() => {
-        // Insertion dans la table associative pcs_bien_enregistre
-        const insertUserPlace = `
-        INSERT INTO pcs_bien_enregistre (utilisateur_enregistre, bien_enregistre) VALUES (?, ?);
-        `;
-        connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
-          if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Erreur lors de l\'enregistrement du bien avec l\'utilisateur' });
-          }
-          res.json({ message: 'Bien créé', bienId: id_bien });
+        .then(() => {
+          // Insertion dans la table associative pcs_bien_enregistre
+          const insertUserPlace = `
+            INSERT INTO pcs_bien_enregistre (utilisateur_enregistre, bien_enregistre) VALUES (?, ?);
+          `;
+          connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).json({ message: 'Erreur lors de l\'enregistrement du bien avec l\'utilisateur' });
+            }
+            res.json({ message: 'Bien créé', bienId: id_bien });
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          res.status(500).json({ message: 'Erreur lors de la création du bien' });
         });
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).json({ message: 'Erreur lors de la création du bien' });
-      });
-    });
-  });
-});
-
-//extractions des biens de l'utilisateur
-app.get('/places', (req, res) => {
-  const { token } = req.cookies;
-  const photos = [];
-  
-
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Token invalide' });
-    }
-
-    const id_utilisateur = decoded.userId;
-
-
-    if (!id_utilisateur) {
-      return res.status(401).json({ message: 'Utilisateur non connecté' });
-    }
-
-    connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erreur lors de la récupération des biens' });
-      }
-      
-      res.json(results);
-    });
-    // connection.query('SELECT * FROM pcs_photo WHERE id_bien = ?', [id_utilisateur], (error, results) => {
-    //   if (error) {
-    //     console.error(error);
-    //     return res.status(500).json({ message: 'Erreur lors de la récupération des photos' });
-    //   }
-      
-    //   res.json(results);
-    // });
-  });
-});
-
-app.get('/places/:id/photos', (req, res) => {
-  const { token } = req.cookies;
-  const bienId = req.params.id;
-
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Token invalide' });
-    }
-
-    const id_utilisateur = decoded.userId;
-
-
-    if (!id_utilisateur) {
-      return res.status(401).json({ message: 'Utilisateur non connecté' });
-    }
-    const query = `
-      SELECT 
-          p.nom_photo, 
-          p.description_photo, 
-          p.chemin_photo, 
-          p.est_couverture
-      FROM 
-          pcs_photo p
-      JOIN 
-          pcs_piece pc ON p.piece_photo = pc.id_piece
-      JOIN 
-          pcs_bien b ON pc.bien_piece = b.id_bien
-      WHERE 
-          b.id_bien = ?;
-    `;
-
-    connection.query(query, [bienId], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erreur lors de la récupération des photos' });
-      }
-      res.json(results);
     });
   });
 });
@@ -514,11 +466,6 @@ app.get('/bien', (req, res) => {
       }
   });
 });
-
-
-
-
-
 
 // Extraction des informations d'un bien
 app.get('/bien/:id', (req, res) => {
@@ -567,7 +514,6 @@ app.get('/bien-photo/:id', (req, res) => {
     }
   });
 });
-
 
 // Supression d'un bien
 // A FAIRE : vérifier si admin ou propriétaire

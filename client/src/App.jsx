@@ -17,8 +17,8 @@ import axios from 'axios';
 import { UserContextProvider } from './userContext.jsx';
 import PlacesPage from './pages/placesPage.jsx';
 import PlacesFormPage from './pages/placesFormPage.jsx';
-
-
+import BookingPage from './pages/bookingPage.jsx';
+import StayPage from './pages/stayPage.jsx';
 axios.defaults.baseURL = 'http://localhost:5000';
 axios.defaults.withCredentials = true;
 function App() {
@@ -31,8 +31,10 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="account/" element={<ProfilePage />} />
+          <Route path="account/bookings" element={<BookingPage/>} />
           <Route path="account/places" element={<PlacesPage />} />
           <Route path="account/places/new" element={<PlacesFormPage />} />
+          <Route path="account/places/:id" element={<StayPage />} />
           <Route path="stayAll" element={<StayAll />} />
           <Route path="service" element={<ServicePage />} />
           <Route path="quotation" element={<QuotationPage />} />
