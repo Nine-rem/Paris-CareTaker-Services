@@ -12,10 +12,14 @@ export function UserContextProvider({ children }) {
             axios.get('/profile', { withCredentials: true })
             .then((response) => {
                 const data = response.data;
+                // console.log(data);
                 if (data) {
                     const userDetails = {
                         firstName: data.firstName,
                         lastName: data.lastName,
+                        isAdmin: data.isAdmin,
+                        isLandlord: data.isBailleur,
+                        isService: data.isPrestaire,
                     };
                     setUser(userDetails);  
                 } else {

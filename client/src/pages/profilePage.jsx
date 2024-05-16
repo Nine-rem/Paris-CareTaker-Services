@@ -8,7 +8,7 @@ import AccountNav from '../accountNav.jsx';
 
 
 /* lien des icones https://heroicons.com/ */
-export default function AccountPage() {
+export default function ProfilePage() {
     const { ready, user, logout } = useContext(UserContext);
     let { subpage } = useParams();
     const navigate = useNavigate();

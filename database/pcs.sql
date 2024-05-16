@@ -765,6 +765,12 @@ ADD COLUMN heure_arrivee TIME NOT NULL,
 ADD COLUMN heure_depart TIME NOT NULL,
 ADD COLUMN information_supplementaire TEXT;
 
+--
+-- Modification des données de la table `pcs_utilisateur` token VARCHAR(255)
+--
+ALTER TABLE pcs_bien
+MODIFY COLUMN token VARCHAR(255);
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -19,6 +19,7 @@ import PlacesPage from './pages/placesPage.jsx';
 import PlacesFormPage from './pages/placesFormPage.jsx';
 import BookingPage from './pages/bookingPage.jsx';
 import StayPage from './pages/stayPage.jsx';
+import AdminPage from './pages/adminPage.jsx';
 axios.defaults.baseURL = 'http://localhost:5000';
 axios.defaults.withCredentials = true;
 function App() {
@@ -36,6 +37,8 @@ function App() {
           <Route path="account/places/new" element={<PlacesFormPage />} />
           <Route path="account/places/:id" element={<StayPage />} />
           <Route path="stayAll" element={<StayAll />} />
+          <Route path= "account/admin" element={<AdminPage />} />
+
           <Route path="service" element={<ServicePage />} />
           <Route path="quotation" element={<QuotationPage />} />
           <Route path="legal" element={<LegalPage />} />

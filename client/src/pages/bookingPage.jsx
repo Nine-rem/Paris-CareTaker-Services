@@ -8,7 +8,7 @@ export default function BookingPage() {
     return(
         <>
         <AccountNav />
-        <h1>Booking Page</h1>
+        <h1>Mes réservations</h1>
         </>
     )
 }

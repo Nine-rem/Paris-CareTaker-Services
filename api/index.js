@@ -183,7 +183,7 @@ app.post('/login', async (req, res) => {
     return res.status(400).json({ message: 'Email invalide' });
   }
   
-  connection.query('SELECT id_utilisateur, email_utilisateur, pwd, nom_utilisateur, prenom_utilisateur FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
+  connection.query('SELECT id_utilisateur, email_utilisateur, pwd, nom_utilisateur, prenom_utilisateur, est_admin, est_bailleur, est_prestataire FROM pcs_utilisateur WHERE email_utilisateur = ?', [email], async (error, results) => {
     if (error) {
       return res.status(500).json({ message: 'Erreur de serveur' });
     }
@@ -202,7 +202,11 @@ app.post('/login', async (req, res) => {
     const email = results[0].email_utilisateur;
     const firstName = results[0].prenom_utilisateur;
     const lastName = results[0].nom_utilisateur;
-    const token = jwt.sign({ userId,email,firstName,lastName }, secretKey, { expiresIn: '1h' });
+    const isAdmin = results[0].est_admin;
+    const isBailleur = results[0].est_bailleur;
+    const isPrestataire = results[0].est_prestataire;
+
+    const token = jwt.sign({ userId,email,firstName,lastName,isAdmin,isBailleur,isPrestataire }, secretKey, { expiresIn: '1h' });
     res.cookie('token', token, { httpOnly: true });
 
     connection.query(
@@ -212,9 +216,9 @@ app.post('/login', async (req, res) => {
         if (updateError) {
           return res.status(500).json({ message: 'Erreur lors de la mise à jour du token' });
         }
-        console.log(email,firstName,lastName, token, userId);
+        console.log(email,firstName,lastName, token, userId,isAdmin,isBailleur,isPrestataire);
 
-        res.json({ email,firstName,lastName, token, userId });
+        res.json({ email,firstName,lastName, token, userId,isAdmin,isBailleur,isPrestataire });
       }
     );
   });
@@ -223,17 +227,15 @@ app.post('/login', async (req, res) => {
 //Profil de l'utilisateur
 
 app.get('/profile', (req, res) => {
-  // const { token } = req.cookies;
-  //token de 60 caractères
-  const {token} = req.cookies.token;
+  const {token} = req.cookies;
   
-  console.log(token.length);
+
   if (token) {
       jwt.verify(token, secretKey, (err, decoded) => {
           if (err) {
               throw err;
           }
-          res.json({ userId: decoded.userId, email: decoded.email, firstName: decoded.firstName, lastName: decoded.lastName });
+          res.json({ userId: decoded.userId, email: decoded.email, firstName: decoded.firstName, lastName: decoded.lastName, isAdmin: decoded.isAdmin, isBailleur: decoded.isBailleur, isPrestataire: decoded.isPrestataire});
       });
   } else {
       res.status(401).json({ message: 'Aucun token fourni' });
@@ -344,6 +346,7 @@ app.post('/places', (req, res) => {
     if (!id_utilisateur) {
       return res.status(401).json({ message: 'Utilisateur non connecté' });
     }
+    //ajouter les donnees du formulaire
 
     const {
       title: nom_bien,
@@ -358,6 +361,7 @@ app.post('/places', (req, res) => {
       additionalInfo: information_supplementaire,
       addedPhotos: photos,
       // photoDescription: description_photo
+      // 
 
     } = req.body;
 
