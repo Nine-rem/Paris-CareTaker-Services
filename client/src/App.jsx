@@ -11,10 +11,12 @@ import LegalPage from './pages/legalPage.jsx';
 import CookiesPage from './pages/cookiesPage.jsx';
 import ServiceTermsPage from './pages/serviceTermsPage.jsx';
 import ContactPage from './pages/contactPage.jsx';
-import AccountPage from './pages/accountPage.jsx';
+import ProfilePage from './pages/profilePage.jsx';
 import Layout from './layout.jsx';
 import axios from 'axios';
 import { UserContextProvider } from './userContext.jsx';
+import PlacesPage from './pages/placesPage.jsx';
+import PlacesFormPage from './pages/placesFormPage.jsx';
 
 
 axios.defaults.baseURL = 'http://localhost:5000';
@@ -26,9 +28,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<IndexPage />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="account" element={<AccountPage />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="account/" element={<ProfilePage />} />
+          <Route path="account/places" element={<PlacesPage />} />
+          <Route path="account/places/new" element={<PlacesFormPage />} />
           <Route path="stayAll" element={<StayAll />} />
           <Route path="service" element={<ServicePage />} />
           <Route path="quotation" element={<QuotationPage />} />

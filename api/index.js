@@ -10,7 +10,10 @@ const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const secretKey = "pa2024";
 const cookieParser = require('cookie-parser');
-
+const imageDownloader = require('image-downloader');
+const multer = require('multer');
+const fs = require('fs');
+//middleware
 app.use(express.json());
 app.use(cors({
   credentials: true,
@@ -19,8 +22,7 @@ app.use(cors({
 app.use(express.json())
  
 app.use(cookieParser());
-//a mettre dans le chemin nécessitant une authentification
-const auth = require('./auth.js');
+app.use("/uploads",express.static(__dirname + '/uploads'));
 
 /* ----------------------------------------------------------
       Gestion des utilisateurs
@@ -90,7 +92,15 @@ app.post("/register", async (req, res) => {
     if (!regexName.test(nom_utilisateur) || !regexName.test(prenom_utilisateur)) {
       return res.status(400).json({ message: 'Nom ou prénom invalide' });
     }
-  
+    
+    //verify birthdate less than 99 years
+    const date = new Date();
+    const currentYear = date.getFullYear();
+    const birthdate = new Date(naissance_utilisateur);
+    const birthYear = birthdate.getFullYear();
+    if (currentYear - birthYear > 99 || currentYear - birthYear < 6) {
+      return res.status(400).json({ message: 'Date de naissance invalide' });
+    }
     //verify password
     const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
     if (!regexPassword.test(password)) {
@@ -199,7 +209,7 @@ app.post('/login', async (req, res) => {
         if (updateError) {
           return res.status(500).json({ message: 'Erreur lors de la mise à jour du token' });
         }
-        console.log(email,firstName,lastName, token, userId);
+        // console.log(email,firstName,lastName, token, userId);
 
         res.json({ email,firstName,lastName, token, userId });
       }
@@ -223,16 +233,10 @@ app.get('/profile', (req, res) => {
   }
 });
 
-app.get('/logout', (req, res) => {
-  res.clearCookie('token');
+app.post('/logout', (req, res) => {
+  res.cookie('token', '').json(true)
   res.json({ message: 'Déconnecté' });
 });
-
-
-
-
-
-
 
 
 
@@ -254,6 +258,251 @@ app.get('/logout', (req, res) => {
 /* ----------------------------------------------------------
       Gestion des biens
 ---------------------------------------------------------- */
+//ajout d'une photo bien par lien
+
+app.post("/upload-by-link", async(req, res) => {
+  const {link} = req.body;
+  const newName = "photo" + Date.now() + '.jpg';
+  await imageDownloader.image({
+    url:link,
+    dest: __dirname + '/uploads/' + newName,
+    
+  })
+  res.json(newName);
+
+
+})
+
+//ajout d'une photo bien par fichier
+const photosMiddleware = multer({dest:"uploads/"});
+app.post("/upload",photosMiddleware.array('photos',100) ,async (req, res) => {
+  const uploadedFiles = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const {path, originalname} = req.files[i];
+    const parts = originalname.split(".");
+    const extension = parts[parts.length - 1];
+    const newPath = path + "." + extension;
+    fs.renameSync(path, newPath)
+    uploadedFiles.push(newPath.replace("uploads\\",""));
+    
+  }  
+  
+  res.json(uploadedFiles);
+
+});
+
+//suppression d'une photo
+app.delete("/upload/:filename", (req, res) => {
+  const {filename} = req.params;
+  fs.unlink(__dirname + "/uploads/" + filename, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Erreur lors de la suppression du fichier");
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
+
+app.post('/places', (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+
+    const id_utilisateur = decoded.userId;
+
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+
+    const {
+      title: nom_bien,
+      address: adresse_bien,
+      zipcode: cp_bien,
+      city: ville_bien,
+      description: description_bien,
+      maxGuests: nb_max_personnes,
+      checkIn: heure_arrivee,
+      checkOut: heure_depart,
+      equipments: equipements,
+      additionalInfo: information_supplementaire,
+      addedPhotos: photos,
+    } = req.body;
+
+    console.log(id_utilisateur);
+    const query = `
+      INSERT INTO pcs_bien (
+        nom_bien,
+        adresse_bien,
+        cp_bien,
+        ville_bien,
+        description_bien,
+        nb_max_personnes,
+        heure_arrivee,
+        heure_depart,
+        information_supplementaire,
+        bailleur,
+        agence_principale_bien
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,1);
+    `;
+    const values = [
+      nom_bien,
+      adresse_bien,
+      cp_bien,
+      ville_bien,
+      description_bien,
+      nb_max_personnes,
+      heure_arrivee,
+      heure_depart,
+      information_supplementaire,
+      id_utilisateur 
+
+    ];
+
+    connection.query(query, values, (error, results) => {
+
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la création du bien' });
+      }
+      const id_bien = results.insertId;
+
+      // // Insertion des équipements
+      // const insertEquipements = `
+      //   INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
+      // `;
+      
+      // const equipementQueries = equipements.map(equipement => {
+      //   return new Promise((resolve, reject) => {
+      //     connection.query(insertEquipements, [id_bien, equipement], (err, results) => {
+      //       if (err) return reject(err);
+      //       resolve(results);
+      //     });
+      //   });
+      // });
+      
+    
+
+
+
+
+
+      // Insertion des photos
+      const insertPhotos = `
+      INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
+      `;
+      const photoQueries = photos.map(photo => {
+        return new Promise((resolve, reject) => {
+          connection.query(insertPhotos, [photo, id_bien], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+      });
+      
+      // Promise.all([...equipementQueries, ...photoQueries])
+      Promise.all([...photoQueries])
+      .then(() => {
+        // Insertion dans la table associative pcs_bien_enregistre
+        const insertUserPlace = `
+        INSERT INTO pcs_bien_enregistre (utilisateur_enregistre, bien_enregistre) VALUES (?, ?);
+        `;
+        connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Erreur lors de l\'enregistrement du bien avec l\'utilisateur' });
+          }
+          res.json({ message: 'Bien créé', bienId: id_bien });
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur lors de la création du bien' });
+      });
+    });
+  });
+});
+
+//extractions des biens de l'utilisateur
+app.get('/places', (req, res) => {
+  const { token } = req.cookies;
+  const photos = [];
+  
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+
+    const id_utilisateur = decoded.userId;
+
+
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+
+    connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la récupération des biens' });
+      }
+      
+      res.json(results);
+    });
+    // connection.query('SELECT * FROM pcs_photo WHERE id_bien = ?', [id_utilisateur], (error, results) => {
+    //   if (error) {
+    //     console.error(error);
+    //     return res.status(500).json({ message: 'Erreur lors de la récupération des photos' });
+    //   }
+      
+    //   res.json(results);
+    // });
+  });
+});
+
+app.get('/places/:id/photos', (req, res) => {
+  const { token } = req.cookies;
+  const bienId = req.params.id;
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+
+    const id_utilisateur = decoded.userId;
+
+
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    const query = `
+      SELECT 
+          p.nom_photo, 
+          p.description_photo, 
+          p.chemin_photo, 
+          p.est_couverture
+      FROM 
+          pcs_photo p
+      JOIN 
+          pcs_piece pc ON p.piece_photo = pc.id_piece
+      JOIN 
+          pcs_bien b ON pc.bien_piece = b.id_bien
+      WHERE 
+          b.id_bien = ?;
+    `;
+
+    connection.query(query, [bienId], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la récupération des photos' });
+      }
+      res.json(results);
+    });
+  });
+});
+
 
 // Extraction de tous les biens
 app.get('/bien', (req, res) => {
@@ -265,6 +514,11 @@ app.get('/bien', (req, res) => {
       }
   });
 });
+
+
+
+
+
 
 // Extraction des informations d'un bien
 app.get('/bien/:id', (req, res) => {
@@ -313,6 +567,7 @@ app.get('/bien-photo/:id', (req, res) => {
     }
   });
 });
+
 
 // Supression d'un bien
 // A FAIRE : vérifier si admin ou propriétaire

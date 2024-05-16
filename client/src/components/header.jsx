@@ -6,6 +6,7 @@ import iconDark from '../assets/logos/icon_dark.png';
 import titleDark from '../assets/logos/title_dark.png';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../userContext';
+import Button from 'react-bootstrap/Button';
 function Header() {
     const { user } = useContext(UserContext);
     return (
@@ -117,8 +118,8 @@ function Header() {
             <div className="col-2 text-end d-none d-md-block">
             {!!user ? (
                             <div>
-                                <Link to="/account"><span>{user.firstName} {user.lastName}!</span></Link>
-                                <Link to="/logout"><button type="button" className="btn btn-dark">Déconnexion</button></Link>
+                                <Link to="/account"><Button variant = "dark">{user.firstName}</Button></Link>
+                                {/* <Link to="/logout"><button type="button" className="btn btn-dark">Déconnexion</button></Link> */}
                             </div>
                         ) : (
                             <>
