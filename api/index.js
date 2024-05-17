@@ -346,7 +346,6 @@ app.post('/places', (req, res) => {
     if (!id_utilisateur) {
       return res.status(401).json({ message: 'Utilisateur non connecté' });
     }
-    //ajouter les donnees du formulaire
 
     const {
       title: nom_bien,
@@ -359,13 +358,8 @@ app.post('/places', (req, res) => {
       checkOut: heure_depart,
       equipments: equipements,
       additionalInfo: information_supplementaire,
-      addedPhotos: photos,
-      // photoDescription: description_photo
-      // 
-
     } = req.body;
 
-    console.log(id_utilisateur);
     const query = `
       INSERT INTO pcs_bien (
         nom_bien,
@@ -379,7 +373,7 @@ app.post('/places', (req, res) => {
         information_supplementaire,
         bailleur,
         agence_principale_bien
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,1);
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1);
     `;
     const values = [
       nom_bien,
@@ -392,52 +386,45 @@ app.post('/places', (req, res) => {
       heure_depart,
       information_supplementaire,
       id_utilisateur 
-
     ];
 
     connection.query(query, values, (error, results) => {
-
       if (error) {
         console.error(error);
         return res.status(500).json({ message: 'Erreur lors de la création du bien' });
       }
       const id_bien = results.insertId;
 
-      // // Insertion des équipements
-      // const insertEquipements = `
-      //   INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
-      // `;
-      
-      // const equipementQueries = equipements.map(equipement => {
-      //   return new Promise((resolve, reject) => {
-      //     connection.query(insertEquipements, [id_bien, equipement], (err, results) => {
-      //       if (err) return reject(err);
-      //       resolve(results);
-      //     });
-      //   });
-      // });
-      
-    
-
-
-
-
-
-      // Insertion des photos
-      const insertPhotos = `
-        INSERT INTO pcs_photo (nom_photo, id_bien) VALUES (?, ?);
+      // Insertion des équipements
+      const insertEquipements = `
+        INSERT INTO pcs_bien_possede (id_bien, id_equipement) VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?));
       `;
-      const photoQueries = photos.map(photo => {
+      
+      const equipementQueries = equipements.map(equipement => {
         return new Promise((resolve, reject) => {
-          connection.query(insertPhotos, [photo, id_bien], (err, results) => {
+          connection.query(insertEquipements, [id_bien, equipement], (err, results) => {
             if (err) return reject(err);
             resolve(results);
           });
         });
       });
 
-      // Promise.all([...equipementQueries, ...photoQueries])
-      Promise.all([...photoQueries])
+      // Insertion des photos avec informations supplémentaires
+      const insertPhotos = `
+        INSERT INTO pcs_photo (nom_photo, id_bien, titre_photo, piece_photo, description_photo) VALUES (?, ?, ?, ?, ?);
+      `;
+      const photoQueries = photos.map(photo => {
+        const { filename, title, room, description } = photo; // Extraire les informations de chaque photo
+        return new Promise((resolve, reject) => {
+          connection.query(insertPhotos, [filename, id_bien, title, room, description], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+      });
+
+      // Exécuter toutes les requêtes d'insertion
+      Promise.all([...equipementQueries, ...photoQueries])
         .then(() => {
           // Insertion dans la table associative pcs_bien_enregistre
           const insertUserPlace = `
@@ -446,7 +433,7 @@ app.post('/places', (req, res) => {
           connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
             if (err) {
               console.error(err);
-              return res.status(500).json({ message: 'Erreur lors de l\'enregistrement du bien avec l\'utilisateur' });
+              return res.status(500).json({ message: "Erreur lors de l'enregistrement du bien avec l'utilisateur" });
             }
             res.json({ message: 'Bien créé', bienId: id_bien });
           });
@@ -459,22 +446,9 @@ app.post('/places', (req, res) => {
   });
 });
 
-
-// Récupération des équipements disponibles
-app.get('/equipements', (req, res) => {
-  connection.query('SELECT * FROM pcs_equipement', (err, results) => {
-    if (err) {
-      res.status(500).json({ error: 'Erreur lors de la récupération des équipements' });
-    } else {
-      res.status(200).json(results);
-    }
-  });
-}); 
-
-
-// Extraction de tous les biens validés
+// Extraction de tous les biens
 app.get('/bien', (req, res) => {
-    connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, results) => {
+    connection.query('SELECT * FROM pcs_bien', (err, results) => {
       if (err) {
         res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
       } else {
@@ -495,6 +469,15 @@ app.get('/bien/:id', (req, res) => {
   });
 });
 
+app.get('/equipements', (req, res) => {
+  connection.query('SELECT * FROM pcs_equipement', (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Erreur lors de la récupération des équipements' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+}); 
 // Extraction des équipements d'un bien
 app.get('/bien-equipement/:id', (req, res) => {
   const id = req.params.id;

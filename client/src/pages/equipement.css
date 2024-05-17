@@ -1,0 +1,47 @@
+/* Equipements.css */
+
+.equipements-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Espace entre les éléments */
+}
+
+.equipement-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: calc(33.333% - 20px); /* Largeur pour trois colonnes avec espace */
+    box-sizing: border-box;
+}
+
+.equipement-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.equipement-checkbox .checkbox-content {
+    display: flex;
+    align-items: center;
+    padding: 3px;
+    border-radius: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.equipement-checkbox input[type="checkbox"]:checked + .checkbox-content {
+    background-color: #AF7357;
+    color: white;
+}
+
+.equipement-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
+}
+
+.equipement-label {
+    font-size: 1rem;
+    margin-left: 5px;
+}
