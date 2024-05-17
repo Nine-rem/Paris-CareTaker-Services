@@ -460,9 +460,21 @@ app.post('/places', (req, res) => {
 });
 
 
-// Extraction de tous les biens
+// Récupération des équipements disponibles
+app.get('/equipements', (req, res) => {
+  connection.query('SELECT * FROM pcs_equipement', (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Erreur lors de la récupération des équipements' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+}); 
+
+
+// Extraction de tous les biens validés
 app.get('/bien', (req, res) => {
-    connection.query('SELECT * FROM pcs_bien', (err, results) => {
+    connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, results) => {
       if (err) {
         res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
       } else {

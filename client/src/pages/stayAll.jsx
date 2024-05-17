@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import pmr from '../assets/images/pmr.png';
 import animal from '../assets/images/animal.png';
+import axios from 'axios';
 
 export default function StayAll() {
     const [biens, setBiens] = useState([]);
@@ -10,23 +11,19 @@ export default function StayAll() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:5000/bien')
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Erreur lors du chargement des données.');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setBiens(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError(err.message);
-                setLoading(false);
-            });
-    }, []);
-
+        axios.get('/bien', (req, res) => {
+            console.log(req);
+            console.log(res);
+        })
+        .then((response) => {
+            setBiens(response.data);
+            setLoading(false);
+        })
+        .catch((error) => {
+            setError(error.message);
+            setLoading(false);
+        });
+    })
     return (
         <div>
             <div id="hero-principal-image" className="px-4 py-5 d-flex justify-content-center align-items-center hero-secondary hero-position">

@@ -1,6 +1,8 @@
+import axios from 'axios';
 import React from 'react';
-
+import { useState } from 'react';
 export default function Equipements({ selected, onChange }) {
+    const [equipement, setEquipement] = useState("");
     function handleClick(ev) {
         const { checked, name } = ev.target;
         if (checked) {
@@ -8,12 +10,24 @@ export default function Equipements({ selected, onChange }) {
         } else {
             onChange(selected.filter(selectedName => selectedName !== name));
         }
+
+    }
+    axios.get('/equipements')
+    .then(response => {
+        setEquipement(response.data);
+    })
+    .catch(error => {
+        console.error("Erreur lors de la récupération des équipements :", error);
+    });
+    if (!equipement) {
+        return <div>Chargement...</div>;
+
     }
 
     return (
         <>
             <label className="custom-checkbox">
-                <input type="checkbox" name="wifi" checked={selected.includes('wifi')} onChange={handleClick}></input>
+                <input type="checkbox" name={equipement.nom_equipement} checked={selected.includes(equipement.nom_equipement)} onChange={handleClick}></input>
                 <div className="checkbox-content">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
@@ -21,7 +35,7 @@ export default function Equipements({ selected, onChange }) {
                     <span>Wi-Fi</span>
                 </div>
             </label>
-            <label className="custom-checkbox">
+            {/* <label className="custom-checkbox">
                 <input type="checkbox" name="parking" checked={selected.includes('parking')} onChange={handleClick}></input>
                 <div className="checkbox-content">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -29,8 +43,8 @@ export default function Equipements({ selected, onChange }) {
                     </svg>
                     <span>Parking</span>
                 </div>
-            </label>
-            <label className="custom-checkbox">
+            </label> */}
+            {/* <label className="custom-checkbox">
                 <input type="checkbox" name="pets" checked={selected.includes('pets')} onChange={handleClick}></input>
                 <div className="checkbox-content">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -38,8 +52,8 @@ export default function Equipements({ selected, onChange }) {
                     </svg>
                     <span>Animaux</span>
                 </div>
-            </label>
-            <label className="custom-checkbox">
+            </label> */}
+            {/* <label className="custom-checkbox">
                 <input type="checkbox" name="tv" checked={selected.includes('tv')} onChange={handleClick}></input>
                 <div className="checkbox-content">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -47,7 +61,7 @@ export default function Equipements({ selected, onChange }) {
                     </svg>
                     <span>TV</span>
                 </div>
-            </label>
+            </label> */}
         </>
     );
 }
