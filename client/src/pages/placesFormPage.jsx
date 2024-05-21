@@ -24,11 +24,11 @@ export default function PlacesFormPage() {
     const [maxGuests, setMaxGuests] = useState("1");
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [pricePerNight, setPricePerNight] = useState("");
     const [redirect, setRedirect] = useState(false);
 
 
     async function addNewPlace(ev) {
-
         ev.preventDefault();
         try {
             await axios.post('/places', {
@@ -42,14 +42,29 @@ export default function PlacesFormPage() {
                 additionalInfo,
                 checkIn,
                 checkOut,
-                maxGuests
+                maxGuests,
+                pricePerNight
             });
             setSuccessMessage('Bien créé avec succès.');
             setRedirect(true);
         } catch (error) {
-            setErrorMessage('Erreur lors de la création du bien.');
+            if (error.response) {
+                console.log("Response data:", error.response.data);
+                console.log("Response status:", error.response.status);
+                console.log("Response headers:", error.response.headers);
+                setErrorMessage(`Erreur lors de la création du bien : ${error.response.data.message || error.response.status}`);
+            } else if (error.request) {
+                // La requête a été faite mais aucune réponse n'a été reçue
+                console.log("Request data:", error.request);
+                setErrorMessage("Aucune réponse reçue du serveur.");
+            } else {
+                // Une erreur est survenue lors de la configuration de la requête
+                console.log("Error message:", error.message);
+                setErrorMessage(`Erreur lors de la création du bien : ${error.message}`);
+            }
         }
     }
+
 
     
     function inputHeader(title) {
@@ -113,7 +128,7 @@ export default function PlacesFormPage() {
             <Form.Group className="mb-3">
                 <Form.Control as="textarea" placeholder="Informations complémentaires" value={additionalInfo} onChange={ev => setAdditionalInfo(ev.target.value)} />
             </Form.Group>
-            {preInput("Heure du Check-in et Check-out", "Indiquez les horaires d'arrivée et de départ de votre logement")}
+            {preInput("Information pour les voyageurs", "Indiquez les horaires d'arrivée et de départ de votre logement ainsi que le nombre maximum de voyageurs et le prix par nuit.")}
 
             <div className="d-flex gap-4">
                 <div>
@@ -132,6 +147,12 @@ export default function PlacesFormPage() {
                     <h3>Nombre maximum de voyageurs</h3>
                     <Form.Group>
                         <Form.Control type="text" value={maxGuests} onChange={ev => setMaxGuests(ev.target.value)} />
+                    </Form.Group>
+                </div>
+                <div>
+                    <h3>Prix par nuit</h3>
+                    <Form.Group>
+                        <Form.Control type="text" value={pricePerNight} onChange={ev => setPricePerNight(ev.target.value)} />
                     </Form.Group>
                 </div>
             </div>

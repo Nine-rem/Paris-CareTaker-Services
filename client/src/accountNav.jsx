@@ -1,15 +1,25 @@
 import React from "react";
 import Button from 'react-bootstrap/Button';
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation,Navigate } from "react-router-dom";
 import './placesPage.css';
 import userProfile from './assets/images/user.png';
 import { UserContext } from './userContext.jsx';
 import { useContext } from "react";
 
+
 export default function AccountNav() {
-    const { user } = useContext(UserContext);
+    const { user,ready } = useContext(UserContext);
+    //Vériier si l'utilisateur est connecté
+    if (!ready) {
+        return <div>Loading...</div>;
+    }
+
+    if (ready && !user) {
+        return <Navigate to="/login" />;
+    }
+
+
     function isAdmin(user) {
-        console.log(user.isAdmin);
         if (user && user.isAdmin === 0) {
             return false;
         } else if (user && user.isAdmin === 1) {
@@ -21,7 +31,6 @@ export default function AccountNav() {
         
     }
     function isLandlord(user) {
-        console.log("landloard:",user.isLandlord);
         if (user && user.isLandlord === 0) {
             return false;
         } else if (user && user.isLandlord === 1) {
@@ -76,7 +85,7 @@ export default function AccountNav() {
                 </Link>)}
             
         {user && isAdmin(user) && (
-        <>
+
                 <Link to={"/account/admin"}>
                     <Button variant={linkClasses("admin")}>
                         <svg className="icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -87,7 +96,7 @@ export default function AccountNav() {
                         Admin
                     </Button>
                 </Link>
-            </>
+
             )}
     </nav>
     )
