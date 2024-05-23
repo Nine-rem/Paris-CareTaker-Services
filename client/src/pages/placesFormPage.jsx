@@ -6,7 +6,9 @@ import Equipements from "./equipements";
 import PhotoUploader from "./photoUploader";
 import axios from "axios";
 import AccountNav from "../accountNav";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
+import animal from '../assets/images/animal.png';
+import pmrs from '../assets/images/pmr.png';
 
 
 export default function PlacesFormPage() {
@@ -26,6 +28,8 @@ export default function PlacesFormPage() {
     const [successMessage, setSuccessMessage] = useState("");
     const [pricePerNight, setPricePerNight] = useState("");
     const [redirect, setRedirect] = useState(false);
+    const [pmr, setPmr] = useState(false);
+    const [animals, setAnimals] = useState(false);
 
 
     async function addNewPlace(ev) {
@@ -43,7 +47,9 @@ export default function PlacesFormPage() {
                 checkIn,
                 checkOut,
                 maxGuests,
-                pricePerNight
+                pricePerNight,
+                pmr,
+                animals
             });
             setSuccessMessage('Bien créé avec succès.');
             setRedirect(true);
@@ -88,9 +94,9 @@ export default function PlacesFormPage() {
         );
     }
 
-    if (redirect) {
-        return <Navigate to="/account/places" />;
-    }
+    // if (redirect) {
+    //     return <Navigate to="/account/places" />;
+    // }
 
     return( 
         <div>
@@ -156,10 +162,35 @@ export default function PlacesFormPage() {
                     </Form.Group>
                 </div>
             </div>
+            <div className="d-flex gap-4">
+                <div>
+                    <h3>Accès PMR</h3>
+                    <Form.Group>
+                        <Form.Check type="checkbox" checked={pmr} onChange={ev => setPmr(ev.target.checked)} />
+                        <img src={pmrs} alt="pmr"/>
+                    </Form.Group>
+                </div>
+                <div>
+                    <h3>Accepte les animaux</h3>
+                    <Form.Group>
+                        <Form.Check type="checkbox" checked={animals} onChange={ev => setAnimals(ev.target.checked)} />
+                        <img src={animal} alt="animal"/>
+                    </Form.Group>
+                </div>
+            </div>
             <Button variant="dark" className="mt-4" type='submit'>Enregistrer</Button>
         </form>
         {errorMessage && <Alert variant="danger" className="mt-3">{errorMessage}</Alert>}
-        {successMessage && <Alert variant="success" className="mt-3">{successMessage}</Alert>}
+        {successMessage && (
+        <Link to="/account/places">
+            <Alert variant="success" className="mt-3 clickable">
+            {successMessage}
+            <div>Cliquez pour revenir à la page de vos biens</div>
+            </Alert>
+        </Link>)
+            
+        }
+        
     </div>
     </div>
     );

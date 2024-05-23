@@ -344,15 +344,23 @@ app.post('/places', (req, res) => {
         zipcode: cp_bien,
         city: ville_bien,
         description: description_bien,
-        maxGuests: nb_max_personnes,
+        maxGuests: capacite_bien,
         checkIn: heure_arrivee,
         checkOut: heure_depart,
         equipments = [],
         additionalInfo: information_supplementaire,
+        pricePerNight: tarif_bien,
         addedPhotos = [],
+        photoInfo = []
         
       } = req.body;
-  
+      let { pmr: pmr_ok_bien, animals: animal_ok_bien } = req.body;
+      if (pmr_ok_bien === true) {
+        pmr_ok_bien = 1;
+      }
+      if (animal_ok_bien === true) {
+        animal_ok_bien = 1;
+      }
       const query = `
         INSERT INTO pcs_bien (
           nom_bien,
@@ -360,13 +368,16 @@ app.post('/places', (req, res) => {
           cp_bien,
           ville_bien,
           description_bien,
-          nb_max_personnes,
+          capacite_bien,
           heure_arrivee,
           heure_depart,
+          animal_ok_bien,
+          pmr_ok_bien,
           information_supplementaire,
+          tarif_bien,
           bailleur,
           agence_principale_bien
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1);
+        ) VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, 1);
       `;
       const values = [
         nom_bien,
@@ -374,10 +385,13 @@ app.post('/places', (req, res) => {
         cp_bien,
         ville_bien,
         description_bien,
-        nb_max_personnes,
+        capacite_bien,
         heure_arrivee,
         heure_depart,
+        animal_ok_bien,
+        pmr_ok_bien,
         information_supplementaire,
+        tarif_bien,
         id_utilisateur
       ];
 
@@ -491,7 +505,7 @@ app.get('/rooms', (req, res) => {
 //       zipcode: cp_bien,
 //       city: ville_bien,
 //       description: description_bien,
-//       maxGuests: nb_max_personnes,
+//       maxGuests: capacite_bien,
 //       checkIn: heure_arrivee,
 //       checkOut: heure_depart,
 //       equipments = [],
@@ -506,7 +520,7 @@ app.get('/rooms', (req, res) => {
 //         cp_bien,
 //         ville_bien,
 //         description_bien,
-//         nb_max_personnes,
+//         capacite_bien,
 //         heure_arrivee,
 //         heure_depart,
 //         information_supplementaire,
@@ -520,7 +534,7 @@ app.get('/rooms', (req, res) => {
 //       cp_bien,
 //       ville_bien,
 //       description_bien,
-//       nb_max_personnes,
+//       capacite_bien,
 //       heure_arrivee,
 //       heure_depart,
 //       information_supplementaire,

@@ -105,11 +105,13 @@ export default function StayPage() {
                         <span className="bold-brown-text centered-text mb-5">{data.type_location_bien}</span>
                         <p>{data.description_bien}</p>
                         <p>
-                            {data.PMR_ok_bien && <img src={pmr} alt="Accès PMR" title="Accès PMR" width="15px" style={{ marginRight: '13px' }} />}
-                            {data.PMR_ok_bien && <span className="small-italic-text"> Accessible et adapté aux personnes à mobilité réduite</span>}
+                            {data.PMR_ok_bien === 1 && <img src={pmr} alt="Accès PMR" title="Accès PMR" width="15px" style={{ marginRight: '13px' }}  />}
+                            {data.PMR_ok_bien === 1  && <span className="small-italic-text"> Accessible et adapté aux personnes à mobilité réduite</span>}
+                          
                             <br />
-                            {data.animal_ok_bien && <img src={animal} alt="Pet friendly" title="Pet friendly" width="18px" style={{ marginRight: '10px' }} />}
-                            {data.animal_ok_bien && <span className="small-italic-text"> Animaux de compagnie autorisés</span>}
+                            {data.animal_ok_bien === 1 && <img src={animal} alt="Pet friendly" title="Pet friendly" width="18px" style={{ marginRight: '10px' }} />}
+                            {data.animal_ok_bien === 1 && <span className="small-italic-text"> Animaux de compagnie autorisés</span>}
+                          
                         </p>
                         <div className="d-flex justify-content-center align-items-center">
                             <div className="mt-4">
