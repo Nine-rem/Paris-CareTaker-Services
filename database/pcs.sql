@@ -760,7 +760,6 @@ COMMIT;
 -- Modification des données de la table `pcs_bien`
 --
 ALTER TABLE pcs_bien
-ADD COLUMN nb_max_personnes INT NOT NULL,
 ADD COLUMN heure_arrivee TIME NOT NULL,
 ADD COLUMN heure_depart TIME NOT NULL,
 ADD COLUMN information_supplementaire TEXT;
