@@ -7,6 +7,8 @@ import localisation from '../assets/images/localisation.png';
 import surface from '../assets/images/surface.png';
 import capacite from '../assets/images/capacite.png';
 import price from '../assets/images/price.png';
+import { useContext } from 'react';
+import { UserContext } from '../userContext';
 
 export default function StayPage() {
     const { id } = useParams();
@@ -16,6 +18,7 @@ export default function StayPage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const {user, ready} = useContext(UserContext);
     const url = 'http://localhost:5000';
     const urlPhoto = 'http://localhost/client/src/assets/images/stay/';
     const urlService = 'http://localhost/client/src/assets/images/equipment-service/';
@@ -82,7 +85,7 @@ export default function StayPage() {
         setLoading(false);
     }, [id]);
 
-    if (loading) {
+    if (loading || !ready) {
         return <p>Chargement...</p>;
     }
 
@@ -129,9 +132,9 @@ export default function StayPage() {
                 ))}
                 <div className="d-flex justify-content-center align-items-center">
                     <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Réserver ce logement</Button>
-                    <Button className="btn btn-success mt-5 mx-3">Valider</Button>
-                    <Button className="btn btn-danger mt-5 mx-3">Supprimer</Button>
-                    <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Modifier</Button>
+                    {user && user.isAdmin === 1 && <Button className="btn btn-success mt-5 mx-3">Valider</Button>}
+                    {user && (user.isAdmin === 1 || user.isLandlord === 1) && <Button className="btn btn-danger mt-5 mx-3">Supprimer</Button>}
+                    {user && (user.isAdmin === 1 || user.isLandlord === 1) && <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Modifier</Button>}
                 </div>
             </div>
 

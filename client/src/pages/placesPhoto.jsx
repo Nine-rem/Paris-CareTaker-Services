@@ -1,29 +1,29 @@
-import React from "react";
-import { useParams } from "react-router";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function PlacesPhoto() {
-    const { id } = useParams();
-    const [place, setPlace] = useState(null);
+export default function PlacesPhoto({ placeId }) {
     const [photo, setPhoto] = useState(null);
+
     useEffect(() => {
-        async function fetchPlace() {
-            const { data } = await axios.get(`/bien-photo/${id}`);
-            setPlace(data);
-            setPhoto(data.photos[0]);
-        }
-        fetchPlace();
-    }, [id]);
-    if (!place) {
-        return <div>Chargement...</div>;
+        axios.get(`/photo-cover/${placeId}`)
+            .then((response) => {
+                setPhoto(response.data);
+                // console.log(response.data);
+
+            })
+            .catch((error) => {
+                console.error("Erreur lors de la récupération de la photo de couverture :", error);
+            });
+    }, [placeId]);
+
+    if (!photo) {
+        return <div>Loading...</div>;
     }
+
     return (
-        <>
-            <div id="placesPhoto" className="box">
-                <h2>{place.name}</h2>
-                <img src={photo} alt={place.name} />
-            </div>
-        </>
+        <div>
+            <img src={photo.url} alt={photo.alt} />
+            {console.log(photo.url)}
+        </div>
     );
 }

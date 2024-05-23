@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import './../placesPage.css';
 import AccountNav from "../accountNav";
@@ -9,22 +9,15 @@ import PlacesPhoto from "./placesPhoto";
 export default function PlacesPage() {
     const [places, setPlaces] = useState([]);
 
-    // useEffect(() => {
-    //     const fetchPlacesAndPhotos = async () => {
-    //         try {
-    //             const { data: placesData } = await axios.get('/places');
-    //             const placesWithPhotos = await Promise.all(placesData.map(async (place) => {
-    //                 const { data: photos } = await axios.get(`/places/${place.id_bien}/photos`);
-    //                 return { ...place, photos };
-    //             }));
-    //             setPlaces(placesWithPhotos);
-    //         } catch (error) {
-    //             console.error('Erreur lors de la récupération des logements et des photos:', error);
-    //         }
-    //     };
- 
-    //     fetchPlacesAndPhotos();
-    // }, []);
+    useEffect(() => {
+        axios.get('/places')
+            .then((response) => {
+                setPlaces(response.data);
+            })
+            .catch((error) => {
+                console.error("Erreur lors de la récupération des logements :", error);
+            });
+    }, []);
 
     return (
         <>
@@ -49,9 +42,9 @@ export default function PlacesPage() {
                                     <div className="card-body d-flex flex-column">
                                         <h3 className="card-title">{place.nom_bien}</h3>
                                         <div>
-                                            <PlacePhotos photos={place.photos} />
+                                            <PlacesPhoto placeId={place.id_bien} />
                                         </div>
-                                        <p className="card-text">{place.addresse_bien}, {place.cp_bien}, {place.ville_bien}</p>
+                                        <p className="card-text">{place.adresse_bien}, {place.cp_bien}, {place.ville_bien}</p>
                                         <Link to={`/account/places/${place.id_bien}`} className="mt-auto">
                                             <Button variant="dark" size="sm">Voir</Button>
                                         </Link>

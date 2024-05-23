@@ -42,9 +42,7 @@ export default function ProfilePage() {
                         <button onClick={handleLogout} type="button" className="btn btn-dark max-w-sm mt-2">Logout</button>
                     </div>
                 )}
-                {subpage === 'places' && (
-                    <PlacesPage />
-                )}
+                
             </div>
         </>
     );

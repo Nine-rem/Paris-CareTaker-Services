@@ -21,48 +21,52 @@ export default function RegisterPage() {
     const [role, setRole] = useState("");
     const [company, setCompany] = useState("");
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState({}); 
+
     async function registerUser(ev) {
         ev.preventDefault();
         setError("");
-        try{
-            const response = await axios.post ('/register', {
-            lastName,
-            firstName,
-            birthdate,
-            address,
-            postalCode,
-            city,
-            email,
-            password,
-            confirmPassword,
-            siret,
-            phoneNumber,
-            role,
-            company
-        });
+        setFieldErrors({});
+        try {
+            const response = await axios.post('/register', {
+                lastName,
+                firstName,
+                birthdate,
+                address,
+                postalCode,
+                city,
+                email,
+                password,
+                confirmPassword,
+                siret,
+                phoneNumber,
+                role,
+                company
+            });
 
-        console.log('Utilisateur inscrit:', response.data.message);
-    } catch (error) {
-        console.error('Erreur lors de l\'inscription:', error);
-        if (error.response) {
-            setError(error.response.data.message);
-        } else {
-            setError('Une erreur s\'est produite');
+            console.log('Utilisateur inscrit:', response.data.message);
+        } catch (error) {
+            console.error('Erreur lors de l\'inscription:', error);
+            if (error.response && error.response.data) {
+                setError(error.response.data.message);
+                if (error.response.data.errors) {
+                    setFieldErrors(error.response.data.errors); 
+                }
+            } else {
+                setError('Une erreur s\'est produite');
+            }
         }
     }
-}
 
     const handleRoleChange = (event) => {
         setRole(event.target.value);
     }
-    
-    
 
     return (
-        <div id = "register" className="d-flex justify-content-center align-items-center">
+        <div id="register" className="d-flex justify-content-center align-items-center">
             <div id="signup" className="box w-80">
                 <h1 className="text-4xl text-center mb-4">Inscription</h1>
-                {error && <p className="text-danger">{error}</p>}
+            
                 <Form onSubmit={registerUser}>
                     {/* Champ Nom */}
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextLastName">
@@ -71,8 +75,9 @@ export default function RegisterPage() {
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="text" placeholder="nom" required="required"
-                            value={lastName} 
-                            onChange={ev => setLastName(ev.target.value)} />
+                                value={lastName}
+                                onChange={ev => setLastName(ev.target.value)} />
+                            {fieldErrors.lastName && <p className="text-danger">{fieldErrors.lastName}</p>}
                         </Col>
                     </Form.Group>
 
@@ -83,9 +88,10 @@ export default function RegisterPage() {
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="text" placeholder="Prénom" required="required"
-                            value={firstName}
-                            onChange={ev => setFirstName(ev.target.value)}
+                                value={firstName}
+                                onChange={ev => setFirstName(ev.target.value)}
                             />
+                            {fieldErrors.firstName && <p className="text-danger">{fieldErrors.firstName}</p>}
                         </Col>
                     </Form.Group>
 
@@ -96,22 +102,24 @@ export default function RegisterPage() {
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="date" required="required"
-                            value={birthdate}
-                            onChange={ev => setBirthdate(ev.target.value)}
+                                value={birthdate}
+                                onChange={ev => setBirthdate(ev.target.value)}
                             />
+                            {fieldErrors.birthdate && <p className="text-danger">{fieldErrors.birthdate}</p>}
                         </Col>
                     </Form.Group>
                     {/* Champ Adresse */}
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextAdress">
-                    <Form.Label column sm="2">
-                        Adresse
-                    </Form.Label>
-                    <Col sm="10">
-                        <Form.Control type="text" placeholder="Adresse" required="required"
-                        value={address}
-                        onChange={ev => setAddress(ev.target.value)}
-                        />
-                    </Col>
+                        <Form.Label column sm="2">
+                            Adresse
+                        </Form.Label>
+                        <Col sm="10">
+                            <Form.Control type="text" placeholder="Adresse" required="required"
+                                value={address}
+                                onChange={ev => setAddress(ev.target.value)}
+                            />
+                            {fieldErrors.address && <p className="text-danger">{fieldErrors.address}</p>}
+                        </Col>
                     </Form.Group>
 
                     {/* Champ Ville */}
@@ -120,24 +128,24 @@ export default function RegisterPage() {
                         <Col sm="10">
                             <Form.Control type="text" placeholder="Ville" required="required"
                                 value={city}
-                                onChange={ev => setCity(ev.target.value)} 
+                                onChange={ev => setCity(ev.target.value)}
                             />
+                            {fieldErrors.city && <p className="text-danger">{fieldErrors.city}</p>}
                         </Col>
                     </Form.Group>
-                    {/* Champ Code postal*/}
+                    {/* Champ Code postal */}
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPostalCode">
                         <Form.Label column sm="2">
                             Code postal
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="text" placeholder="Code postal" required="required"
-                            value={postalCode}
-                            onChange={ev => setPostalCode(ev.target.value)}
+                                value={postalCode}
+                                onChange={ev => setPostalCode(ev.target.value)}
                             />
+                            {fieldErrors.postalCode && <p className="text-danger">{fieldErrors.postalCode}</p>}
                         </Col>
                     </Form.Group>
-                    
-
 
                     {/* Champ téléphone */}
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPhone">
@@ -146,15 +154,12 @@ export default function RegisterPage() {
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="text" placeholder="numéro de téléphone" required="required"
-                            value={phoneNumber}
-                            onChange={ev => setphoneNumber(ev.target.value)}
+                                value={phoneNumber}
+                                onChange={ev => setphoneNumber(ev.target.value)}
                             />
+                            {fieldErrors.phoneNumber && <p className="text-danger">{fieldErrors.phoneNumber}</p>}
                         </Col>
                     </Form.Group>
-
-
-
-                    
 
                     {/* Champ Email */}
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
@@ -163,9 +168,10 @@ export default function RegisterPage() {
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="email" placeholder="your@email.com" required="required"
-                            value={email}
-                            onChange={ev => setEmail(ev.target.value)}
+                                value={email}
+                                onChange={ev => setEmail(ev.target.value)}
                             />
+                            {fieldErrors.email && <p className="text-danger">{fieldErrors.email}</p>}
                         </Col>
                     </Form.Group>
 
@@ -176,24 +182,27 @@ export default function RegisterPage() {
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="password" placeholder="Mot de passe" required="required"
-                            value={password}    
-                            onChange={ev => setPassword(ev.target.value)}
+                                value={password}
+                                onChange={ev => setPassword(ev.target.value)}
                             />
+                            {fieldErrors.password && <p className="text-danger">{fieldErrors.password}</p>}
                         </Col>
                     </Form.Group>
 
-                    {/* Champ Mot de passe */}
+                    {/* Champ Confirmation de mot de passe */}
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPasswordConfirm">
                         <Form.Label column sm="2">
                             Confirmez votre mot de passe
                         </Form.Label>
                         <Col sm="10">
                             <Form.Control type="password" placeholder="Mot de passe de confirmation" required="required"
-                            value={confirmPassword}
-                            onChange={ev => setConfirmPassword(ev.target.value)}
+                                value={confirmPassword}
+                                onChange={ev => setConfirmPassword(ev.target.value)}
                             />
+                            {fieldErrors.confirmPassword && <p className="text-danger">{fieldErrors.confirmPassword}</p>}
                         </Col>
                     </Form.Group>
+
                     {/* Sélection du rôle */}
                     <Form.Group as={Row} className="mb-3" controlId="formRole">
                         <Form.Label column sm="2">
@@ -206,43 +215,42 @@ export default function RegisterPage() {
                                 <option value="landlord">Bailleur</option>
                                 <option value="serviceProvider">Prestataire</option>
                             </Form.Control>
+                            {fieldErrors.role && <p className="text-danger">{fieldErrors.role}</p>}
                         </Col>
                     </Form.Group>
 
                     {/* Champs supplémentaires basés sur le rôle */}
-
                     {role === "serviceProvider" && (
-                <>
+                        <>
+                            {/* Champ nom de société */}
+                            <Form.Group as={Row} className="mb-3" controlId="formPlaintextCompany">
+                                <Form.Label column sm="2">
+                                    Entreprise
+                                </Form.Label>
+                                <Col sm="10">
+                                    <Form.Control type="text" placeholder="Nom de l'entreprise"
+                                        value={company}
+                                        onChange={ev => setCompany(ev.target.value)}
+                                    />
+                                    {fieldErrors.company && <p className="text-danger">{fieldErrors.company}</p>}
+                                </Col>
+                            </Form.Group>
 
-                    {/* Champ nom de société*/}
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextCompany">
-                        <Form.Label column sm="2">
-                            Entreprise
-                        </Form.Label>
-                        <Col sm="10">
-                            <Form.Control type="text" placeholder="Nom de l'entreprise" 
-                            value={company}
-                            onChange={ev => setCompany(ev.target.value)}
-                            />
-                        </Col>
-                    </Form.Group>
-
-                    {/* Champ SIRET */}
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextSiret">
-                        <Form.Label column sm="2">SIRET</Form.Label>
-                        <Col sm="10">
-                            <Form.Control 
-                                type="text" 
-                                placeholder="SIRET" 
-                                value={siret}
-                                onChange={ev => setSiret(ev.target.value)} 
-                            />
-                        </Col>
-                    </Form.Group>
-
-                </>
-                    
-            )}
+                            {/* Champ SIRET */}
+                            <Form.Group as={Row} className="mb-3" controlId="formPlaintextSiret">
+                                <Form.Label column sm="2">SIRET</Form.Label>
+                                <Col sm="10">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="SIRET"
+                                        value={siret}
+                                        onChange={ev => setSiret(ev.target.value)}
+                                    />
+                                    {fieldErrors.siret && <p className="text-danger">{fieldErrors.siret}</p>}
+                                </Col>
+                            </Form.Group>
+                        </>
+                    )}
 
                     {/* Bouton d'inscription */}
                     <Row>
@@ -251,9 +259,9 @@ export default function RegisterPage() {
                         </Col>
                     </Row>
                     <div className='text-black-50'>
-                            vous avez déjà un compte ?
-                            <Link to={'/login'} className = "text-dark">Connectez-vous</Link>
-                        </div>
+                        vous avez déjà un compte ?
+                        <Link to={'/login'} className="text-dark">Connectez-vous</Link>
+                    </div>
                 </Form>
             </div>
         </div>

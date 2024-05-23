@@ -60,83 +60,82 @@ app.post("/register", async (req, res) => {
   }
   
   const saltRounds = 10;
+  let errorArray = {};
+
   if (confirmPassword !== password) {
-    return res.status(400).json({ message: 'Les mots de passes ne correspondent pas' });
+    errorArray.confirmPassword = 'Les mots de passe ne correspondent pas';
   }
 
-  
-  
-  
   try {
     const [results] = await connection.promise().query('SELECT email_utilisateur FROM pcs_utilisateur WHERE email_utilisateur = ?', [email_utilisateur]);
     if (results.length > 0) {
-      return res.status(409).json({ message: 'compte déjà existant' });
+      errorArray.email = 'Compte déjà existant';
     }
-    
-    let errorArray = [];
-    
+
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(email_utilisateur)) {
-      errorArray.push('Email invalide');
+      errorArray.email = 'Email invalide';
     }
     
-    //clean phone number
     const regexPhone = /^\+?\d{1,4}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
     if (!regexPhone.test(tel_utilisateur)) {
-      errorArray.push('Numéro de téléphone invalide');
+      errorArray.phoneNumber = 'Numéro de téléphone invalide';
     }
   
-    //clean name
     const regexName = /^[a-zA-ZÀ-ÿ\s]{2,40}$/;
     nom_utilisateur = nom_utilisateur.trim().toUpperCase();
     prenom_utilisateur = prenom_utilisateur.trim().toLowerCase();
     prenom_utilisateur = prenom_utilisateur.charAt(0).toUpperCase() + prenom_utilisateur.slice(1);
-    if (!regexName.test(nom_utilisateur) || !regexName.test(prenom_utilisateur)) {
-      
+    if (!regexName.test(nom_utilisateur)) {
+      errorArray.lastName = 'Nom invalide';
+    }
+    if (!regexName.test(prenom_utilisateur)) {
+      errorArray.firstName = 'Prénom invalide';
     }
     
-    //verify birthdate less than 99 years
     const date = new Date();
     const currentYear = date.getFullYear();
     const birthdate = new Date(naissance_utilisateur);
     const birthYear = birthdate.getFullYear();
     if (currentYear - birthYear > 99 || currentYear - birthYear < 6) {
-      return res.status(400).json({ message: 'Date de naissance invalide' });
+      errorArray.birthdate = 'Date de naissance invalide';
     }
-    //verify password
+    
     const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
     if (!regexPassword.test(password)) {
-      return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre' });
+      errorArray.password = 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
     }
 
-    /* if err > 0 afficher les photo*/
-    
+    if (Object.keys(errorArray).length > 0) {
+      return res.status(400).json({ message: 'Validation errors', errors: errorArray });
+    }
+
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
     const query = `
     INSERT INTO pcs_utilisateur (
       societe_utilisateur,
       SIRET_utilisateur,
-        nom_utilisateur,
-        prenom_utilisateur,
-        naissance_utilisateur,
-        adresse_utilisateur,
-        cp_utilisateur,
-        ville_utilisateur,
-        tel_utilisateur,
-        email_utilisateur,
-        pwd,
-        formule_utilisateur,
-        langue_utilisateur,
-        date_creation_utilisateur,
-        date_maj_utilisateur,
-        derniere_connexion_utilisateur,
-        est_admin,
-        est_bailleur,
-        est_prestataire,
-        est_banni,
-        token
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, NOW(), NOW(), NOW(), 0, ?, ?, 0, NULL);
+      nom_utilisateur,
+      prenom_utilisateur,
+      naissance_utilisateur,
+      adresse_utilisateur,
+      cp_utilisateur,
+      ville_utilisateur,
+      tel_utilisateur,
+      email_utilisateur,
+      pwd,
+      formule_utilisateur,
+      langue_utilisateur,
+      date_creation_utilisateur,
+      date_maj_utilisateur,
+      derniere_connexion_utilisateur,
+      est_admin,
+      est_bailleur,
+      est_prestataire,
+      est_banni,
+      token
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, NOW(), NOW(), NOW(), 0, ?, ?, 0, NULL);
     `;
     
     const values = [
@@ -159,12 +158,16 @@ app.post("/register", async (req, res) => {
     res.json({ message: 'Inscrit!', userId: insertResult.insertId });
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ message: 'un erreur est survenue.', error: error.message });
+    res.status(500).json({ message: 'Un erreur est survenue.', error: error.message });
   }
 });
 
 
-
+app.get('/mdp', (req, res) => {
+  bcrypt.hash('kirtika', 10).then((hash) => {
+    res.json({ hash });
+  });
+});
 
 //connexion de l'utilisateur
 
@@ -598,6 +601,30 @@ app.get('/rooms', (req, res) => {
 //   });
 // });
 
+//extraction des biens d'un utilisateur
+app.get("/places", (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+    const id_utilisateur = decoded.userId;
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la récupération des biens' });
+      }
+      res.json(results);
+    });
+  }
+  );
+});
+
+
+
 // Extraction de tous les biens
 app.get('/bien', (req, res) => {
     connection.query('SELECT * FROM pcs_bien', (err, results) => {
@@ -606,6 +633,30 @@ app.get('/bien', (req, res) => {
       } else {
         res.status(200).json(results);
       }
+  });
+});
+
+//photo de couverture
+app.get('/photo-cover/:id', (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  const query = `
+    SELECT chemin_photo 
+    FROM pcs_photo 
+    WHERE (SELECT bien_piece FROM pcs_piece WHERE bien_piece = ?) 
+    AND est_couverture = 1
+  `;
+  values = [id]; 
+
+  connection.query(query, [id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erreur lors de la récupération de la photo de couverture' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Aucune photo de couverture trouvée' });
+    }
+    const photo = results[0];
+    res.status(200).json({ url: `http://localhost/client/src/assets/images/stay/${id}${photo.chemin_photo}`, alt: `Photo de couverture pour le bien ${id}` });
   });
 });
 
