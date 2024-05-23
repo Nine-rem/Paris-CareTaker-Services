@@ -9,7 +9,9 @@ import { useContext } from "react";
 
 export default function AccountNav() {
     const { user,ready } = useContext(UserContext);
-    //Vériier si l'utilisateur est connecté
+    const pathName = useLocation();
+    let subpage = pathName.pathname.split('/')[2];
+
     if (!ready) {
         return <div>Loading...</div>;
     }
@@ -45,8 +47,6 @@ export default function AccountNav() {
 
    
 
-    const pathName = useLocation();
-    let subpage = pathName.pathname.split('/')[2];
     if (subpage === undefined) {
         subpage = 'profile';
     }

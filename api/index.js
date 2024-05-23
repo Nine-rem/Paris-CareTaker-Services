@@ -290,8 +290,8 @@ app.post("/upload",photosMiddleware.array('photos',100) ,async (req, res) => {
       fs.unlinkSync(path);
       return res.status(400).json({ message: 'Fichier invalide' });
     }
-
-    const newPath = path + "." + extension;
+    const newPath = path + "." + extension
+    console.log(newPath)
     fs.renameSync(path, newPath)
     uploadedFiles.push(newPath.replace("uploads\\",""));
     
@@ -300,6 +300,7 @@ app.post("/upload",photosMiddleware.array('photos',100) ,async (req, res) => {
   res.json(uploadedFiles);
 
 });
+
 
 
 //suppression d'une photo
@@ -349,6 +350,7 @@ app.post('/places', (req, res) => {
         equipments = [],
         additionalInfo: information_supplementaire,
         addedPhotos = [],
+        
       } = req.body;
   
       const query = `
@@ -403,25 +405,25 @@ app.post('/places', (req, res) => {
         });
 
         const insertPiece = `
-          INSERT INTO pcs_piece (nom_piece, bien_piece, type_piece, taille_piece) 
+          INSERT INTO pcs_piece (nom_piece, bien_piece, type_piece, surface_piece) 
           VALUES (?, ?, (SELECT id_type_piece FROM pcs_type_piece WHERE nom_type_piece = ?), ?);
         `;
         const insertPhoto = `
-          INSERT INTO pcs_photo (nom_photo, piece_photo, description_photo) 
+          INSERT INTO pcs_photo (nom_photo, piece_photo, description_photo, chemin_photo) 
           VALUES (?, ?, ?);
         `;
 
         const photoQueries = addedPhotos.map(photo => {
           console.log(photo);
           return new Promise((resolve, reject) => {
-            connection.query(insertPiece, [photo.title, id_bien, photo.room, photo.room_size], (err, results) => {
+            connection.query(insertPiece, ["titre de la pièce", id_bien, "WC", 10], (err, results) => {
               if (err) {
                 console.error("Erreur lors de l'insertion de la pièce:", err);
                 return reject(err);
               }
               const id_piece = results.insertId;
               
-              connection.query(insertPhoto, [photo.filename, id_piece, photo.description], (err, results) => {
+              connection.query(insertPhoto, ["nom fichier", id_piece, "description photo","chemin photo" ], (err, results) => {
                 if (err) {
                   console.error("Erreur lors de l'insertion de la photo:", err);
                   return reject(err);
@@ -739,5 +741,5 @@ app.delete('/agences/:id', (req, res) => {
 ---------------------------------------------------------- */
 
 app.listen(5000, () => {    
-    console.log("Serveur à l'écoute")
+    console.log("Serveur à l'écoute sur le port 5000")
 })

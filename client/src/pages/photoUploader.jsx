@@ -36,9 +36,10 @@ export default function PhotoUploader({ addedPhotos, onChange }) {
             data.append(`info[${file.name}][description]`, info.description || '');
             data.append(`info[${file.name}][room_size]`, info.room_size || '');
         }
+        
 
         axios.post('/upload', data, {
-            headers: { 'Content-Type': 'multipart/form-data' }
+            headers: { 'Content-type': 'multipart/form-data' }
         })
         .then((response) => {
             const { data: photoDetails } = response;
@@ -48,6 +49,7 @@ export default function PhotoUploader({ addedPhotos, onChange }) {
                 photoDetails.forEach(photo => {
                     newInfo[photo.filename] = { title: '', room: '', description: '', room_size: '' };
                 });
+                console.log(newInfo);
                 return newInfo;
             });
             setSuccessMessage("Photos importées avec succès !");
@@ -60,6 +62,7 @@ export default function PhotoUploader({ addedPhotos, onChange }) {
     }
 
     function removePhoto(filename) {
+        console.log(filename);
         onChange(prev => prev.filter(photo => photo.filename !== filename));
         setPhotoInfo(prev => {
             const newInfo = { ...prev };
