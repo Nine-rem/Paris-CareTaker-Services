@@ -8,6 +8,7 @@ export default function AdminPage() {
         <div>
             <AccountNav />
             <h1>Admin</h1>
+            
         </div>
         </>
     )  

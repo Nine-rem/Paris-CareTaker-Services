@@ -10,6 +10,8 @@ const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const secretKey = "pa2024";
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const path = require('path');
 const imageDownloader = require('image-downloader');
 const multer = require('multer');
 const fs = require('fs');
@@ -279,33 +281,43 @@ app.post('/logout', (req, res) => {
 /* ----------------------------------------------------------
       Gestion des biens
 ---------------------------------------------------------- */
-//ajout d'une photo bien par fichier
-const photosMiddleware = multer({dest:"uploads/"});
-app.post("/upload",photosMiddleware.array('photos',100) ,async (req, res) => {
-  const uploadedFiles = [];
-  for (let i = 0; i < req.files.length; i++) {
-    const {path, originalname} = req.files[i];
-    const parts = originalname.split(".");
-    const extension = parts[parts.length - 1];
-
-    //vérifier si le fichier est une image
-    if (!["jpg","jpeg","png"].includes(extension) && req.files[i].room_size > 5000000) {
-      fs.unlinkSync(path);
-      return res.status(400).json({ message: 'Fichier invalide' });
-    }
-    const newPath = path + "." + extension
-    console.log(newPath)
-    fs.renameSync(path, newPath)
-    uploadedFiles.push(newPath.replace("uploads\\",""));
-    
-  }  
-  
-  res.json(uploadedFiles);
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, 'uploads/');  // Ensure this folder exists
+  },
+  filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
 });
 
+const upload = multer({ storage: storage });
 
+// Endpoint to handle photo uploads
+app.post('/upload', upload.array('photos', 10), (req, res) => {  // Allow up to 10 files to be uploaded
+  const files = req.files;
+  const additionalInfo = req.body;
 
+  console.log('Received files: ', files);
+  console.log('Additional info: ', additionalInfo);
+
+  // Process each file and its corresponding additional data here
+  res.status(200).json({
+      message: "Files uploaded successfully!",
+      data: files.map(file => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          info: {
+              title: additionalInfo[`info[${file.originalname}][title]`],
+              room: additionalInfo[`info[${file.originalname}][room]`],
+              description: additionalInfo[`info[${file.originalname}][description]`],
+              room_size: additionalInfo[`info[${file.originalname}][room_size]`]
+          }
+      }))
+  });
+});
 //suppression d'une photo
 app.delete("/upload/:filename", (req, res) => {
   const {filename} = req.params;
@@ -321,10 +333,10 @@ app.delete("/upload/:filename", (req, res) => {
 
 app.post('/places', (req, res) => {
   const { token } = req.cookies;
-  console.log(req.body);
   jwt.verify(token, secretKey, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: 'Token invalide' });
+      console.error('Token verification error:', err);
+      return res.status(401).json({ message: 'Token invalide', error: err });
     }
     const id_utilisateur = decoded.userId;
     if (!id_utilisateur) {
@@ -334,8 +346,8 @@ app.post('/places', (req, res) => {
     const checkUserQuery = 'SELECT id_utilisateur FROM pcs_utilisateur WHERE id_utilisateur = ?';
     connection.query(checkUserQuery, [id_utilisateur], (userErr, userResults) => {
       if (userErr) {
-        console.error(userErr);
-        return res.status(500).json({ message: 'Erreur lors de la vérification de l\'utilisateur' });
+        console.error('User verification error:', userErr);
+        return res.status(500).json({ message: 'Erreur lors de la vérification de l\'utilisateur', error: userErr });
       }
       if (userResults.length === 0) {
         return res.status(404).json({ message: 'Utilisateur non trouvé' });
@@ -355,7 +367,6 @@ app.post('/places', (req, res) => {
         pricePerNight: tarif_bien,
         addedPhotos = [],
         photoInfo = []
-        
       } = req.body;
       let { pmr: pmr_ok_bien, animals: animal_ok_bien } = req.body;
       if (pmr_ok_bien === true) {
@@ -380,7 +391,7 @@ app.post('/places', (req, res) => {
           tarif_bien,
           bailleur,
           agence_principale_bien
-        ) VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, 1);
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1);
       `;
       const values = [
         nom_bien,
@@ -401,7 +412,7 @@ app.post('/places', (req, res) => {
       connection.query(query, values, (error, results) => {
         if (error) {
           console.error("Erreur lors de l'insertion du bien:", error);
-          return res.status(500).json({ message: 'Erreur lors de la création du bien' });
+          return res.status(500).json({ message: 'Erreur lors de la création du bien', error: error });
         }
         const id_bien = results.insertId;
 
@@ -414,7 +425,7 @@ app.post('/places', (req, res) => {
             connection.query(insertEquipments, [id_bien, equipement], (err, results) => {
               if (err) {
                 console.error("Erreur lors de l'insertion de l'équipement:", err);
-                return reject(err);
+                return reject({ message: 'Erreur lors de l\'insertion de l\'équipement', error: err });
               }
               resolve(results);
             });
@@ -427,23 +438,24 @@ app.post('/places', (req, res) => {
         `;
         const insertPhoto = `
           INSERT INTO pcs_photo (nom_photo, piece_photo, description_photo, chemin_photo) 
-          VALUES (?, ?, ?);
+          VALUES (?, ?, ?, ?);
         `;
 
-        const photoQueries = addedPhotos.map(photo => {
-          console.log(photo);
+        const photoQueries = addedPhotos.map((photo, index) => {
+          const info = photoInfo[index] || {};
+          console.log('Photo info:', info);
           return new Promise((resolve, reject) => {
-            connection.query(insertPiece, ["titre de la pièce", id_bien, "WC", 10], (err, results) => {
+            connection.query(insertPiece, [info.title, id_bien, "Autre", info.room_size || 0], (err, results) => {
               if (err) {
                 console.error("Erreur lors de l'insertion de la pièce:", err);
-                return reject(err);
+                return reject({ message: 'Erreur lors de l\'insertion de la pièce', error: err });
               }
               const id_piece = results.insertId;
-              
-              connection.query(insertPhoto, ["nom fichier", id_piece, "description photo","chemin photo" ], (err, results) => {
+
+              connection.query(insertPhoto, [info.title || "Photo", id_piece, info.description || "", photo], (err, results) => {
                 if (err) {
                   console.error("Erreur lors de l'insertion de la photo:", err);
-                  return reject(err);
+                  return reject({ message: 'Erreur lors de l\'insertion de la photo', error: err });
                 }
                 resolve(results);
               });
@@ -460,20 +472,19 @@ app.post('/places', (req, res) => {
             connection.query(insertUserPlace, [id_utilisateur, id_bien], (err, results) => {
               if (err) {
                 console.error("Erreur lors de l'enregistrement du bien avec l'utilisateur:", err);
-                return res.status(500).json({ message: "Erreur lors de l'enregistrement du bien avec l'utilisateur" });
+                return res.status(500).json({ message: "Erreur lors de l'enregistrement du bien avec l'utilisateur", error: err });
               }
               res.json({ message: 'Bien créé', bienId: id_bien });
             });
           })
           .catch(error => {
             console.error("Erreur lors de la création du bien:", error);
-            res.status(500).json({ message: 'Erreur lors de la création du bien' });
+            res.status(500).json({ message: 'Erreur lors de la création du bien', error: error });
           });
       });
     });
   });
 });
-
 
 
 app.get('/rooms', (req, res) => {
@@ -485,6 +496,8 @@ app.get('/rooms', (req, res) => {
     }
   });
 });
+
+
 
 
 
@@ -641,10 +654,13 @@ app.get('/photo-cover/:id', (req, res) => {
   const id = req.params.id;
   console.log(id);
   const query = `
-    SELECT chemin_photo 
-    FROM pcs_photo 
-    WHERE (SELECT bien_piece FROM pcs_piece WHERE bien_piece = ?) 
-    AND est_couverture = 1
+  SELECT chemin_photo 
+  FROM pcs_photo
+  JOIN pcs_piece ON pcs_photo.piece_photo = pcs_piece.id_piece
+  JOIN pcs_bien ON pcs_piece.bien_piece = pcs_bien.id_bien
+  WHERE pcs_photo.est_couverture = 1
+  AND pcs_bien.id_bien = 2;
+  
   `;
   values = [id]; 
 
