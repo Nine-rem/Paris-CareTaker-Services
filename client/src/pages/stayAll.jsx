@@ -71,6 +71,7 @@ export default function StayAll() {
                                         <th>Capacité</th>
                                         <th>Surface (m²)</th>
                                         <th>Localisation</th>
+                                        <th>Prix</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -87,6 +88,7 @@ export default function StayAll() {
                                                 <td className="align-middle">{bien.capacite_bien}</td>
                                                 <td className="align-middle">{bien.surface_bien}m²</td>
                                                 <td className="align-middle">{bien.ville_bien} ({bien.cp_bien})</td>
+                                                <td className="align-middle">{bien.tarif_bien}€</td>
                                                 <td className="align-middle">
                                                     <Link to={`/account/places/${bien.id_bien}`}>
                                                         <Button variant="primary">Voir</Button>
