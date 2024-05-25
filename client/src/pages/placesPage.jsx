@@ -45,7 +45,10 @@ export default function PlacesPage() {
                                             <PlacesPhoto placeId={place.id_bien} />
                                         </div>
                                         <p className="card-text">{place.adresse_bien}, {place.cp_bien}, {place.ville_bien}</p>
-                                        <Link to={`/account/places/${place.id_bien}`} className="mt-auto">
+                                        <Link to={`/account/places/${place.id_bien}/edit`} className="mt-auto">
+                                            <Button variant="dark" size="sm">Modifier</Button>
+                                        </Link>
+                                        <Link to = {`/account/places/${place.id_bien}`} className="mt-2">
                                             <Button variant="dark" size="sm">Voir</Button>
                                         </Link>
                                     </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import pmr from '../assets/images/pmr.png';
 import animal from '../assets/images/animal.png';
@@ -7,8 +7,8 @@ import localisation from '../assets/images/localisation.png';
 import surface from '../assets/images/surface.png';
 import capacite from '../assets/images/capacite.png';
 import price from '../assets/images/price.png';
-import { useContext } from 'react';
 import { UserContext } from '../userContext';
+import axios from 'axios';
 
 export default function StayPage() {
     const { id } = useParams();
@@ -18,7 +18,8 @@ export default function StayPage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const {user, ready} = useContext(UserContext);
+    const [isOwner, setIsOwner] = useState(false);
+    const { user, ready } = useContext(UserContext);
     const url = 'http://localhost:5000';
     const urlPhoto = 'http://localhost/client/src/assets/images/stay/';
     const urlService = 'http://localhost/client/src/assets/images/equipment-service/';
@@ -46,7 +47,6 @@ export default function StayPage() {
                 }
                 const photos = await response.json();
                 setStayPhotos(photos);
-                console.log(photos);
             } catch (err) {
                 setError(err.message);
             }
@@ -78,12 +78,26 @@ export default function StayPage() {
             }
         };
 
+        const checkOwnership = async () => {
+            try {
+                const response = await axios.get(`${url}/bien-owner/${id}`);
+                if (response.data.length > 0) {
+                    setIsOwner(true);
+                }
+            } catch (err) {
+                console.error("Erreur lors de la récupération du propriétaire du bien :", err);
+            }
+        };
+
         fetchStayData();
         fetchStayPhotos();
         fetchEquipments();
         fetchServices();
+        if (ready && user) {
+            checkOwnership();
+        }
         setLoading(false);
-    }, [id]);
+    }, [id, ready, user]);
 
     if (loading || !ready) {
         return <p>Chargement...</p>;
@@ -97,7 +111,6 @@ export default function StayPage() {
     const getImagePath = (photo) => `${urlPhoto}${id}${photo.chemin_photo}`;
     const getServicePath = (service) => `${urlService}${service.id_service}.png`;
     const getEquipementPath = (equipment) => `${urlEquipement}equipement-${equipment.id_equipement}.png`;
-    // `../assets/images/equipment-service/equipement-${equipment.id_equipement}.png`
 
     return (
         <div>
@@ -108,13 +121,11 @@ export default function StayPage() {
                         <span className="bold-brown-text centered-text mb-5">{data.type_location_bien}</span>
                         <p>{data.description_bien}</p>
                         <p>
-                            {data.PMR_ok_bien === 1 && <img src={pmr} alt="Accès PMR" title="Accès PMR" width="15px" style={{ marginRight: '13px' }}  />}
-                            {data.PMR_ok_bien === 1  && <span className="small-italic-text"> Accessible et adapté aux personnes à mobilité réduite</span>}
-                          
+                            {data.PMR_ok_bien === 1 && <img src={pmr} alt="Accès PMR" title="Accès PMR" width="15px" style={{ marginRight: '13px' }} />}
+                            {data.PMR_ok_bien === 1 && <span className="small-italic-text"> Accessible et adapté aux personnes à mobilité réduite</span>}
                             <br />
                             {data.animal_ok_bien === 1 && <img src={animal} alt="Pet friendly" title="Pet friendly" width="18px" style={{ marginRight: '10px' }} />}
                             {data.animal_ok_bien === 1 && <span className="small-italic-text"> Animaux de compagnie autorisés</span>}
-                          
                         </p>
                         <div className="d-flex justify-content-center align-items-center">
                             <div className="mt-4">
@@ -133,8 +144,14 @@ export default function StayPage() {
                 <div className="d-flex justify-content-center align-items-center">
                     <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Réserver ce logement</Button>
                     {user && user.isAdmin === 1 && <Button className="btn btn-success mt-5 mx-3">Valider</Button>}
-                    {user && (user.isAdmin === 1 || user.isLandlord === 1) && <Button className="btn btn-danger mt-5 mx-3">Supprimer</Button>}
-                    {user && (user.isAdmin === 1 || user.isLandlord === 1) && <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Modifier</Button>}
+                    {user && (user.isAdmin === 1 || isOwner) &&
+                        <Button className="btn btn-danger mt-5 mx-3">Supprimer</Button>
+                    }
+                    {isOwner && 
+                        <Link to={`/account/places/${id}/edit`}>
+                            <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Modifier</Button>
+                        </Link>
+                    }
                 </div>
             </div>
 
@@ -177,9 +194,8 @@ export default function StayPage() {
                     {services.length > 0 ? (
                         services.map((service) => (
                             <p key={service.id_service} style={{ fontWeight: '600' }}>
-                                <img src={getServicePath()} alt={service.nom_service} title={service.nom_service} width="60px" style={{ marginRight: '10px' }} />
+                                <img src={getServicePath(service)} alt={service.nom_service} title={service.nom_service} width="60px" style={{ marginRight: '10px' }} />
                                 {service.nom_service}
-                                
                             </p>
                         ))
                     ) : (
