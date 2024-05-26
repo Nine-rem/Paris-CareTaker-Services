@@ -36,7 +36,6 @@ export default function PlacesFormPage() {
         }
         axios.get(`/places/${id}`).then((response) => {
             const data = response.data;
-            console.log(data);
             setTitle(data.nom_bien);
             setAddress(data.adresse_bien);
             setZipcode(data.cp_bien);
@@ -49,23 +48,23 @@ export default function PlacesFormPage() {
             setCheckOut(data.heure_depart);
             setMaxGuests(data.capacite_bien);
             setPricePerNight(data.tarif_bien);
-            console.log("pmr",data.PMR_ok_bien);
-            console.log("animaux",data.animal_ok_bien);
             if (data.PMR_ok_bien === 1) {
                 setPmr(true);
-            }else{
+            }
+            else {
                 setPmr(false);
             }
             if (data.animal_ok_bien === 1) {
                 setAnimals(true);
-            }else{
+            }
+            else {
                 setAnimals(false);
             }
         }).catch((error) => {
             console.error("Erreur lors de la récupération des données du bien :", error);
             setErrorMessage("Erreur lors de la récupération des données du bien");
         });
-    }, [id]);
+    }, [id]); // Fixez la dépendance ici
 
     async function savePlace(ev) {
         ev.preventDefault();
