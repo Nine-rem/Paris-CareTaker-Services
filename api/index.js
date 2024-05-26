@@ -676,6 +676,134 @@ app.get("/places", (req, res) => {
   }
   );
 });
+app.put('/places/:id', (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+    const id_utilisateur = decoded.userId;
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    const id_bien = req.params.id;
+    const {
+      title: nom_bien,
+      address: adresse_bien,
+      zipcode: cp_bien,
+      city: ville_bien,
+      description: description_bien,
+      maxGuests: capacite_bien,
+      checkIn: heure_arrivee,
+      checkOut: heure_depart,
+      equipments = [],
+      additionalInfo: information_supplementaire,
+      photos = []
+    } = req.body;
+    let { pmr: pmr_ok_bien, animals: animal_ok_bien } = req.body;
+
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: 'Aucune donnée fournie' });
+    }
+
+    pmr_ok_bien = pmr_ok_bien === true ? 1 : 0;
+    animal_ok_bien = animal_ok_bien === true ? 1 : 0;
+
+    const query = `
+      UPDATE pcs_bien SET
+        nom_bien = ?,
+        adresse_bien = ?,
+        cp_bien = ?,
+        ville_bien = ?,
+        description_bien = ?,
+        capacite_bien = ?,
+        heure_arrivee = ?,
+        heure_depart = ?,
+        information_supplementaire = ?,
+        pmr_ok_bien = ?,
+        animal_ok_bien = ?
+      WHERE id_bien = ? AND bailleur = ?
+    `;
+
+    const values = [
+      nom_bien,
+      adresse_bien,
+      cp_bien,
+      ville_bien,
+      description_bien,
+      capacite_bien,
+      heure_arrivee,
+      heure_depart,
+      information_supplementaire,
+      pmr_ok_bien,
+      animal_ok_bien,
+      id_bien,
+      id_utilisateur
+    ];
+
+    connection.query(query, values, (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la mise à jour du bien' });
+      }
+
+      // Suppression des équipements actuels
+      connection.query('DELETE FROM pcs_bien_possede WHERE bien_equipe = ?', [id_bien], (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: 'Erreur lors de la suppression des équipements' });
+        }
+
+        // Insertion des nouveaux équipements
+        const insertEquipments = `
+          INSERT INTO pcs_bien_possede (bien_equipe, equipement_contenu)
+          VALUES (?, (SELECT id_equipement FROM pcs_equipement WHERE nom_equipement = ?))
+        `;
+        const equipmentQueries = equipments.map(equipement => {
+          return new Promise((resolve, reject) => {
+            connection.query(insertEquipments, [id_bien, equipement], (err, results) => {
+              if (err) return reject(err);
+              resolve(results);
+            });
+          });
+        });
+
+        // Suppression des photos actuelles (si nécessaire)
+        connection.query('DELETE FROM pcs_photo WHERE piece_photo = ?', [id_bien], (err) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Erreur lors de la suppression des photos' });
+          }
+
+          // Insertion des nouvelles photos
+          const insertPhotos = `
+            INSERT INTO pcs_photo (nom_photo, piece_photo, titre_photo, description_photo)
+            VALUES (?, ?, ?, ?)
+          `;
+          const photoQueries = photos.map(photo => {
+            const { filename, title, description } = photo;
+            return new Promise((resolve, reject) => {
+              connection.query(insertPhotos, [filename, id_bien, title, description], (err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+              });
+            });
+          });
+
+          // Exécuter toutes les requêtes d'insertion
+          Promise.all([...equipmentQueries, ...photoQueries])
+            .then(() => {
+              res.json({ message: 'Bien mis à jour' });
+            })
+            .catch(error => {
+              console.error(error);
+              res.status(500).json({ message: 'Erreur lors de la mise à jour du bien' });
+            });
+        });
+      });
+    });
+  });
+});
 
 
 // Extraction de tous les biens
