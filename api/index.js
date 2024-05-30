@@ -806,6 +806,39 @@ app.put('/places/:id', (req, res) => {
 });
 
 
+
+app.get('/bien-validated', (req, res) => {
+  connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+}
+);
+
+app.get('/bien-owner', (req, res) => { 
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+    const id_utilisateur = decoded.userId;
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la récupération des biens' });
+      }
+      res.json(results);
+    });
+  }
+  );
+});
+
 // Extraction de tous les biens
 app.get('/bien', (req, res) => {
     connection.query('SELECT * FROM pcs_bien', (err, results) => {

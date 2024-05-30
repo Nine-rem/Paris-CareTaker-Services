@@ -178,3 +178,17 @@ h3, .bold-brown-text {
   background-color: rgba(255, 255, 255, 0.75);
 }
 
+
+
+.reservation-input {
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 20px; /* Rounded container */
+}
+
+.reservation-input input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px; /* Rounded input fields */
+  border: 1px solid #aaa;
+}

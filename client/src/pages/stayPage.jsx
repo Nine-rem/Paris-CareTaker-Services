@@ -80,7 +80,8 @@ export default function StayPage() {
 
         const checkOwnership = async () => {
             try {
-                const response = await axios.get(`${url}/bien-owner/${id}`);
+                const response = await axios.get(`/bien-owner`);
+                console.log(response.data);
                 if (response.data.length > 0) {
                     setIsOwner(true);
                 }
@@ -142,7 +143,25 @@ export default function StayPage() {
                     </React.Fragment>
                 ))}
                 <div className="d-flex justify-content-center align-items-center">
+                    {stayData && stayData.length > 0 && stayData.map((data) => (
+                    <div className='reservation-input'>
+                        <div className='text-bold'> Prix: {data.tarif_bien} €/nuit</div>
+                        <div className='reservation-input'>
+                        <label>Check-in:</label>
+                        <input type='date' className='reservation-input-field' />
+                        </div>
+                        <div className='reservation-input'>
+                        <label>Check-out:</label>
+                        <input type='date' className='reservation-input-field' />
+                        </div>
+                        <div className='reservation-input'>
+                        <label>Nombre de voyageurs:</label>
+                        <input type='number' className='reservation-input-field' />
+                        </div>
+
                     <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Réserver ce logement</Button>
+                    </div>
+                    ))}
                     {user && user.isAdmin === 1 && <Button className="btn btn-success mt-5 mx-3">Valider</Button>}
                     {user && (user.isAdmin === 1 || isOwner) &&
                         <Button className="btn btn-danger mt-5 mx-3">Supprimer</Button>
