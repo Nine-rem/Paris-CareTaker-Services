@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Button from 'react-bootstrap/Button';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import './../placesPage.css';
 import AccountNav from "../accountNav";
 import axios from "axios";
-import PlacesPhoto from "./placesPhoto";
+
 
 export default function PlacesPage() {
     const [places, setPlaces] = useState([]);
+
 
     useEffect(() => {
         axios.get('/places')
@@ -22,7 +23,7 @@ export default function PlacesPage() {
     return (
         <>
             <AccountNav />
-            <div className="container my-5">
+            <Container className="my-5">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2>Mes logements</h2>
                     <Link to="/account/places/new" className="link-no-underline">
@@ -34,34 +35,48 @@ export default function PlacesPage() {
                         </Button>
                     </Link>
                 </div>
-                <div className="row-2">
+                <Row>
                     {places.length > 0 ? (
-                        places.map(place => (
-                            <div key={place.id_bien} className="col-md-4 mb-4">
-                                <div className="card h-100">
-                                    <div className="card-body d-flex flex-column">
-                                        <h3 className="card-title">{place.nom_bien}</h3>
-                                        <div>
-                                            <PlacesPhoto placeId={place.id_bien} />
-                                        </div>
-                                        <p className="card-text">{place.adresse_bien}, {place.cp_bien}, {place.ville_bien}</p>
-                                        <Link to={`/account/places/${place.id_bien}/edit`} className="mt-auto">
-                                            <Button variant="dark" size="sm">Modifier</Button>
-                                        </Link>
-                                        <Link to = {`/account/places/${place.id_bien}`} className="mt-2">
-                                            <Button variant="dark" size="sm">Voir</Button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
+                        places.map(place => {
+
+                            const couverturePhoto = place.photos?.find(photo => photo.est_couverture);
+
+                            return (
+                                <Col md={4} key={place.id_bien} className="mb-4">
+                                    <Card className="property-card">
+                                        {couverturePhoto && couverturePhoto.chemin_photo && (
+                                            <Card.Img
+                                                variant="top"
+                                                src={`http://localhost/client/src/assets/images/stay/${place.id_bien}${couverturePhoto.chemin_photo}`}
+                                                alt={place.nom_bien}
+                                                className="property-card-img"
+                                            />
+                                        )}
+                                        <Card.Body>
+                                            <Card.Title>{place.nom_bien}</Card.Title>
+                                            <Card.Text>
+                                                <strong>{place.tarif_bien} € / nuit</strong>
+                                            </Card.Text>
+                                            <div className="d-flex justify-content-between">
+                                                <Link to={`/account/places/${place.id_bien}`} className="btn btn-dark btn-sm">
+                                                    Voir
+                                                </Link>
+                                                <Link to={`/account/places/${place.id_bien}/edit`} className="btn btn-dark btn-sm">
+                                                    Modifier
+                                                </Link>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            );
+                        })
                     ) : (
                         <div className="col-12 text-center">
                             <p>Aucun logement trouvé.</p>
                         </div>
                     )}
-                </div>
-            </div>
+                </Row>
+            </Container>
         </>
     );
 }

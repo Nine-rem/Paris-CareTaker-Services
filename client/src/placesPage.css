@@ -1,9 +1,30 @@
-.icon-sm {
-    width: 16px;
-    height: 16px;
+.property-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+    transition: transform 0.2s;
 }
-.link-no-underline {
-    text-decoration: none;
+
+.property-card:hover {
+    transform: scale(1.05);
+}
+
+.property-card-img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #333;
+}
+
+.container {
+    margin-top: 20px;
 }
 
 .icon-sm {
@@ -11,6 +32,10 @@
     height: 16px;
     vertical-align: middle; 
     margin-right: 4px; 
+}
+
+.link-no-underline {
+    text-decoration: none;
 }
 
 .text-gray-500 {
@@ -22,7 +47,6 @@
 }
 
 .add-button {
-
     font-weight: bold;
     width: 25%;
     display: flex;
@@ -30,13 +54,12 @@
     justify-content: center;     
     padding: 2rem 2rem;
 }
+
 .svg-icon {
     width: 24px;
     height: 24px;
     border: 10px;
-
 }
-
 
 .custom-checkbox {
     display: flex;
@@ -76,8 +99,6 @@
     border-radius: 15px;
     transition: background-color 0.3s, color 0.3s;
 }
-
-
 
 .photo-gallery {
     display: flex;

@@ -4,7 +4,8 @@ import { Route, Routes } from 'react-router-dom';
 import IndexPage from './pages/indexPage.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import RegisterPage from './pages/registerPage.jsx';
-import StayAll from './pages/stayAll.jsx';
+// import StayAll from './pages/stayAll.jsx';
+import StayAllPage from './pages/stayAllPage.jsx';
 import ServicePage from './pages/servicePage.jsx';
 import QuotationPage from './pages/quotationPage.jsx';
 import LegalPage from './pages/legalPage.jsx';
@@ -37,7 +38,8 @@ function App() {
           <Route path="account/places/new" element={<PlacesFormPage />} />
           <Route path="account/places/:id/edit" element={<PlacesFormPage />} />
           <Route path="account/places/:id" element={<StayPage />} />
-          <Route path="stayAll" element={<StayAll />} />
+          {/* <Route path="stayAll" element={<StayAll />} /> */}
+          <Route path="stayAll" element={<StayAllPage />} />
           <Route path= "account/admin" element={<AdminPage />} />
 
           <Route path="service" element={<ServicePage />} />

@@ -9,6 +9,7 @@ import capacite from '../assets/images/capacite.png';
 import price from '../assets/images/price.png';
 import { UserContext } from '../userContext';
 import axios from 'axios';
+import {  differenceInCalendarDays, differenceInDays } from 'date-fns';
 
 export default function StayPage() {
     const { id } = useParams();
@@ -20,6 +21,13 @@ export default function StayPage() {
     const [error, setError] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const { user, ready } = useContext(UserContext);
+    const [checkIn, setCheckIn] = useState('');
+    const [checkOut, setCheckOut] = useState('');
+    const [numberOfGuests, setNumberOfGuests] = useState(1);
+    const numberOfDays = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
+    
+
+
     const url = 'http://localhost:5000';
     const urlPhoto = 'http://localhost/client/src/assets/images/stay/';
     const urlService = 'http://localhost/client/src/assets/images/equipment-service/';
@@ -138,6 +146,8 @@ export default function StayPage() {
                                 {data.capacite_bien} personne(s) - {countRooms} chambre(s)
                                 <img className="mb-2" src={price} alt="Tarif" title="Tarif" width="35px" style={{ marginRight: '10px', marginLeft: '40px' }} />
                                 {data.tarif_bien} €/nuit
+                                <p>Heure de départ : {data.heure_depart}</p>
+                                <p>Heure d'arrivée : {data.heure_arrivee}</p>
                             </div>
                         </div>
                     </React.Fragment>
@@ -148,18 +158,20 @@ export default function StayPage() {
                         <div className='text-bold'> Prix: {data.tarif_bien} €/nuit</div>
                         <div className='reservation-input'>
                         <label>Check-in:</label>
-                        <input type='date' className='reservation-input-field' />
+                        <input type='date' className='reservation-input-field' value={checkIn} onChange={ev => setCheckIn(ev.target.value)}/>
                         </div>
                         <div className='reservation-input'>
                         <label>Check-out:</label>
-                        <input type='date' className='reservation-input-field' />
+                        <input type='date' className='reservation-input-field' value={checkOut} onChange={ev => setCheckOut(ev.target.value)}/>
                         </div>
                         <div className='reservation-input'>
                         <label>Nombre de voyageurs:</label>
-                        <input type='number' className='reservation-input-field' />
+                        <input type='number' className='reservation-input-field' value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)}/>
                         </div>
 
-                    <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Réserver ce logement</Button>
+                    <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Réserver ce logement
+                    {numberOfDays > 0 && <span> pour {numberOfDays * data.tarif_bien} €</span>}
+                    </Button>
                     </div>
                     ))}
                     {user && user.isAdmin === 1 && <Button className="btn btn-success mt-5 mx-3">Valider</Button>}

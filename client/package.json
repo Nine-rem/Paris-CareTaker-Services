@@ -13,13 +13,14 @@
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.3.3",
+    "date-fns": "^3.6.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-helmet-async": "^2.0.4",
     "react-router-dom": "^6.23.0",
-    "yar": "^9.1.0",
+    "yar": "^2.0.0",
     "yarn": "^1.22.22"
   },
   "devDependencies": {

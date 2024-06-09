@@ -656,26 +656,8 @@ app.get('/places/:id', (req, res) => {
     });
   });
 });
-app.get("/places", (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Token invalide' });
-    }
-    const id_utilisateur = decoded.userId;
-    if (!id_utilisateur) {
-      return res.status(401).json({ message: 'Utilisateur non connecté' });
-    }
-    connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erreur lors de la récupération des biens' });
-      }
-      res.json(results);
-    });
-  }
-  );
-});
+
+
 app.put('/places/:id', (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, secretKey, (err, decoded) => {
@@ -698,7 +680,7 @@ app.put('/places/:id', (req, res) => {
       checkOut: heure_depart,
       equipments = [],
       additionalInfo: information_supplementaire,
-      photos = []
+
     } = req.body;
     let { pmr: pmr_ok_bien, animals: animal_ok_bien } = req.body;
 
@@ -768,38 +750,17 @@ app.put('/places/:id', (req, res) => {
           });
         });
 
-        // Suppression des photos actuelles (si nécessaire)
-        connection.query('DELETE FROM pcs_photo WHERE piece_photo = ?', [id_bien], (err) => {
-          if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Erreur lors de la suppression des photos' });
-          }
 
-          // Insertion des nouvelles photos
-          const insertPhotos = `
-            INSERT INTO pcs_photo (nom_photo, piece_photo, titre_photo, description_photo)
-            VALUES (?, ?, ?, ?)
-          `;
-          const photoQueries = photos.map(photo => {
-            const { filename, title, description } = photo;
-            return new Promise((resolve, reject) => {
-              connection.query(insertPhotos, [filename, id_bien, title, description], (err, results) => {
-                if (err) return reject(err);
-                resolve(results);
-              });
-            });
+
+
+        Promise.all([...equipmentQueries])
+          .then(() => {
+            res.json({ message: 'Bien mis à jour' });
+          })
+          .catch(error => {
+            console.error(error);
+            res.status(500).json({ message: 'Erreur lors de la mise à jour du bien' });
           });
-
-          // Exécuter toutes les requêtes d'insertion
-          Promise.all([...equipmentQueries, ...photoQueries])
-            .then(() => {
-              res.json({ message: 'Bien mis à jour' });
-            })
-            .catch(error => {
-              console.error(error);
-              res.status(500).json({ message: 'Erreur lors de la mise à jour du bien' });
-            });
-        });
       });
     });
   });
@@ -839,14 +800,77 @@ app.get('/bien-owner', (req, res) => {
   );
 });
 
-// Extraction de tous les biens
-app.get('/bien', (req, res) => {
-    connection.query('SELECT * FROM pcs_bien', (err, results) => {
+app.get('/biens', (req, res) => {
+  // Récupération de tous les biens
+  connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, biens) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
+    }
+    
+    // Récupération des photos de chaque bien
+    connection.query('SELECT * FROM pcs_photo', (err, photos) => {
       if (err) {
-        res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
-      } else {
-        res.status(200).json(results);
+        return res.status(500).json({ error: 'Erreur lors de la récupération des photos' });
       }
+
+      // Association des photos à leurs biens respectifs
+      const biensAvecPhotos = biens.map(bien => {
+        return {
+          ...bien,
+          photos: photos.filter(photo => photo.photo_bien_id === bien.id_bien)
+        };
+      });
+
+      res.status(200).json(biensAvecPhotos);
+    });
+  });
+});
+
+app.get('/places', (req, res) => {
+  const token = req.cookies.token; // Assurez-vous que les cookies sont parsés, par exemple avec cookie-parser
+
+  if (!token) {
+    return res.status(401).json({ message: 'Utilisateur non connecté' });
+  }
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+
+    const id_utilisateur = decoded.userId;
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+
+    // Récupération de tous les biens de l'utilisateur
+    connection.query('SELECT * FROM pcs_bien WHERE bailleur = ?', [id_utilisateur], (err, biens) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
+      }
+
+      if (biens.length === 0) {
+        return res.status(200).json([]); // Retourner un tableau vide si l'utilisateur n'a aucun bien
+      }
+
+      // Récupération des photos de chaque bien de l'utilisateur
+      const bienIds = biens.map(bien => bien.id_bien);
+      connection.query('SELECT * FROM pcs_photo WHERE photo_bien_id IN (?)', [bienIds], (err, photos) => {
+        if (err) {
+          return res.status(500).json({ error: 'Erreur lors de la récupération des photos' });
+        }
+
+        // Association des photos à leurs biens respectifs
+        const biensAvecPhotos = biens.map(bien => {
+          return {
+            ...bien,
+            photos: photos.filter(photo => photo.photo_bien_id === bien.id_bien)
+          };
+        });
+
+        res.status(200).json(biensAvecPhotos);
+      });
+    });
   });
 });
 
@@ -860,7 +884,7 @@ app.get('/photo-cover/:id', (req, res) => {
   JOIN pcs_piece ON pcs_photo.piece_photo = pcs_piece.id_piece
   JOIN pcs_bien ON pcs_piece.bien_piece = pcs_bien.id_bien
   WHERE pcs_photo.est_couverture = 1
-  AND pcs_bien.id_bien = 2;
+  AND pcs_bien.id_bien = ?;
   
   `;
   values = [id]; 
