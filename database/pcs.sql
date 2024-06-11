@@ -763,7 +763,7 @@ COMMIT;
 --
 ALTER TABLE pcs_bien
 ADD COLUMN heure_arrivee TIME NOT NULL,
-ADD COLUMN heure_depart TIME NOT NULL,
+ADD COLUMN heure_depart TIME NOT NULL
 
 
 --
