@@ -221,7 +221,7 @@ app.post('/login', async (req, res) => {
         if (updateError) {
           return res.status(500).json({ message: 'Erreur lors de la mise à jour du token' });
         }
-        console.log(email,firstName,lastName, token, userId,isAdmin,isBailleur,isPrestataire);
+        
 
         res.json({ email,firstName,lastName, token, userId,isAdmin,isBailleur,isPrestataire });
       }
@@ -295,7 +295,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Endpoint to handle photo uploads
 app.post('/upload', upload.array('photos', 10), (req, res) => {  
   const files = req.files;
   const additionalInfo = req.body;
@@ -303,7 +302,7 @@ app.post('/upload', upload.array('photos', 10), (req, res) => {
   console.log('Received files: ', files);
   console.log('Additional info: ', additionalInfo);
 
-  // Process each file and its corresponding additional data here
+
   res.status(200).json({
       message: "Files uploaded successfully!",
       data: files.map(file => ({
@@ -785,6 +784,7 @@ app.get('/bien-owner', (req, res) => {
     if (err) {
       return res.status(401).json({ message: 'Token invalide' });
     }
+    console.log("Decoded:", decoded)
     const id_utilisateur = decoded.userId;
     if (!id_utilisateur) {
       return res.status(401).json({ message: 'Utilisateur non connecté' });
@@ -801,19 +801,19 @@ app.get('/bien-owner', (req, res) => {
 });
 
 app.get('/biens', (req, res) => {
-  // Récupération de tous les biens
+
   connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, biens) => {
     if (err) {
       return res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
     }
     
-    // Récupération des photos de chaque bien
+
     connection.query('SELECT * FROM pcs_photo', (err, photos) => {
       if (err) {
         return res.status(500).json({ error: 'Erreur lors de la récupération des photos' });
       }
 
-      // Association des photos à leurs biens respectifs
+
       const biensAvecPhotos = biens.map(bien => {
         return {
           ...bien,
@@ -827,8 +827,7 @@ app.get('/biens', (req, res) => {
 });
 
 app.get('/places', (req, res) => {
-  const token = req.cookies.token; // Assurez-vous que les cookies sont parsés, par exemple avec cookie-parser
-
+  const token = req.cookies.token; 
   if (!token) {
     return res.status(401).json({ message: 'Utilisateur non connecté' });
   }
@@ -850,17 +849,16 @@ app.get('/places', (req, res) => {
       }
 
       if (biens.length === 0) {
-        return res.status(200).json([]); // Retourner un tableau vide si l'utilisateur n'a aucun bien
+        return res.status(200).json([]);
       }
 
-      // Récupération des photos de chaque bien de l'utilisateur
+
       const bienIds = biens.map(bien => bien.id_bien);
       connection.query('SELECT * FROM pcs_photo WHERE photo_bien_id IN (?)', [bienIds], (err, photos) => {
         if (err) {
           return res.status(500).json({ error: 'Erreur lors de la récupération des photos' });
         }
 
-        // Association des photos à leurs biens respectifs
         const biensAvecPhotos = biens.map(bien => {
           return {
             ...bien,
@@ -873,6 +871,22 @@ app.get('/places', (req, res) => {
     });
   });
 });
+
+// app.post('/bookings', (req, res) => { 
+//   const { token } = req.cookies;
+//   jwt.verify(token, secretKey, (err, decoded) => {
+//     if (err) {
+//       return res.status(401).json({ message: 'Token invalide' });
+//     }
+//     const id_utilisateur = decoded.userId;
+//     if (!id_utilisateur) {
+//       return res.status(401).json({ message: 'Utilisateur non connecté' });
+//     }
+//     const {
+//       id_bien,
+//       date_arrivee,
+//       date_depart,
+//     }
 
 //photo de couverture
 app.get('/photo-cover/:id', (req, res) => {
@@ -979,6 +993,70 @@ app.delete('/bien/:id', (req, res) => {
       }
     }
   });
+});
+
+/*
+
+Réservation d'un bien
+
+*/
+
+app.post('/bookings', (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+    const id_utilisateur = decoded.userId;
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    const {
+      id_bien,
+      date_arrivee,
+      date_depart,
+      nb_voyageurs,
+      prix_total
+    } = req.body;
+
+    const query = `
+      INSERT INTO pcs_reservation (bien_reserve, utilisateur_reservation, date_debut_reservation, date_fin_reservation, nb_voyageurs, prix_total, statut_reservation, date_reservation, facture_reservation) 
+      VALUES (?, ?, ?, ?, ?, ?, 0, NOW(),1);
+    `;
+    const values = [id_bien, id_utilisateur, date_arrivee, date_depart, nb_voyageurs, prix_total];
+
+    connection.query(query, values, (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la réservation du bien' });
+      }
+      res.json({ message: 'Bien réservé', reservationId: results.insertId });
+    });
+  });
+});
+
+
+// Extraction des réservations d'un utilisateur
+app.get('/bookings', (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+    const id_utilisateur = decoded.userId;
+    if (!id_utilisateur) {
+      return res.status(401).json({ message: 'Utilisateur non connecté' });
+    }
+    connection.query('SELECT * FROM pcs_reservation WHERE utilisateur_reservation = ?', [id_utilisateur], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur lors de la récupération des réservations' });
+      }
+      res.json(results);
+    });
+
+  });
+  connection.query('SELECT * FROM pcs_bien')
 });
 
 

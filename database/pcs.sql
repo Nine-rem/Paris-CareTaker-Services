@@ -872,6 +872,22 @@ INSERT INTO `pcs_photo` (`nom_photo`, `description_photo`, `chemin_photo`, `piec
 ('cuisine5', 'Cuisine ouverte et fonctionnelle.', '/cuisine5.jpg', (SELECT id_piece FROM pcs_piece WHERE nom_piece = 'Cuisine' AND bien_piece = @bien_id5), 0, @bien_id5),
 ('sdb5', 'Salle de bain avec douche.', '/sdb5.jpg', (SELECT id_piece FROM pcs_piece WHERE nom_piece = 'Salle de bain' AND bien_piece = @bien_id5), 0, @bien_id5);
 
+
+--
+-- Modification de la table pcs_reservation
+--
+ALTER TABLE `pcs_reservation` ADD
+`nb_voyageurs` INT NOT NULL `date_fin_reservation`,
+ADD `prix_total` FLOAT NOT NULL `nb_voyageurs`,
+ADD `statut_reservation` TINYINT NOT NULL `prix_total`;
+
+
+
+
+
+
+
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

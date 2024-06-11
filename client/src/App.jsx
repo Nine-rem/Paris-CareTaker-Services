@@ -19,6 +19,7 @@ import { UserContextProvider } from './userContext.jsx';
 import PlacesPage from './pages/placesPage.jsx';
 import PlacesFormPage from './pages/placesFormPage.jsx';
 import BookingPage from './pages/bookingPage.jsx';
+import BookingsPage from './pages/bookingsPage.jsx';
 import StayPage from './pages/stayPage.jsx';
 import AdminPage from './pages/adminPage.jsx';
 axios.defaults.baseURL = 'http://localhost:5000';
@@ -30,24 +31,24 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<IndexPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="account/" element={<ProfilePage />} />
-          <Route path="account/bookings" element={<BookingPage/>} />
-          <Route path="account/places" element={<PlacesPage />} />
-          <Route path="account/places/new" element={<PlacesFormPage />} />
-          <Route path="account/places/:id/edit" element={<PlacesFormPage />} />
-          <Route path="account/places/:id" element={<StayPage />} />
-          {/* <Route path="stayAll" element={<StayAll />} /> */}
-          <Route path="stayAll" element={<StayAllPage />} />
-          <Route path= "account/admin" element={<AdminPage />} />
-
-          <Route path="service" element={<ServicePage />} />
-          <Route path="quotation" element={<QuotationPage />} />
-          <Route path="legal" element={<LegalPage />} />
-          <Route path="cookies" element={<CookiesPage />} />
-          <Route path="serviceTerms" element={<ServiceTermsPage />} />
-          <Route path="contact" element={<ContactPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/account/" element={<ProfilePage />} />
+          <Route path="/account/places" element={<PlacesPage />} />
+          <Route path="/account/places/new" element={<PlacesFormPage />} />
+          <Route path="/account/places/:id/edit" element={<PlacesFormPage />} />
+          <Route path="/account/places/:id" element={<StayPage />} />
+          {/* <Route path="/stayAll" element={<StayAll />} /> */}
+          <Route path="/stayAll" element={<StayAllPage />} />
+          <Route path= "/account/admin" element={<AdminPage />} />
+          <Route path="/account/bookings" element={<BookingsPage/>} />
+          <Route path="/account/bookings/:id" element={<BookingPage />} />
+          <Route path="/service" element={<ServicePage />} />
+          <Route path="/quotation" element={<QuotationPage />} />
+          <Route path="/legal" element={<LegalPage />} />
+          <Route path="/cookies" element={<CookiesPage />} />
+          <Route path="/serviceTerms" element={<ServiceTermsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Route>
       </Routes>
     </UserContextProvider>

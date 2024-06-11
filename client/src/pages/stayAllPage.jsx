@@ -21,38 +21,49 @@ const StayAllPage = () => {
   }, []);
 
   return (
-    <Container>
-      <Row>
-        {biens.map(bien => {
-          // Vérifiez si la propriété photos est définie
-          const couverturePhoto = bien.photos?.find(photo => photo.est_couverture);
-          
-          return (
-            <Col md={4} key={bien.id_bien} className="mb-4">
-              <Card className="property-card">
-                {couverturePhoto && couverturePhoto.chemin_photo && (
-                  <Card.Img
-                    variant="top"
-                    src={`http://localhost/client/src/assets/images/stay/${bien.id_bien}${couverturePhoto.chemin_photo}`}
-                    alt={bien.nom_bien}
-                    className="property-card-img"
-                  />
-                )}
-                <Card.Body>
-                  <Card.Title>{bien.nom_bien}</Card.Title>
-                  <Card.Text>
-                    <strong>{bien.tarif_bien} € / nuit</strong>
-                  </Card.Text>
-                  <Link to={`/account/places/${bien.id_bien}`} className="btn btn-dark btn-sm">
-                    Voir
-                  </Link>
-                </Card.Body>
-              </Card>
-            </Col>
-          );
-        })}
-      </Row>
-    </Container>
+    <>
+      <div>
+        <div id="hero-principal-image" className="px-4 py-5 d-flex justify-content-center align-items-center hero-secondary hero-position">
+          <div className="py-5 box-margin-left">
+            <h1 className="display-5 fw-bold">Catalogue des biens</h1>
+          </div>
+        </div>
+        <div id="search-stay" className="box centered-text">
+          <h2>Trouvez la location de vos rêves !</h2>
+        </div>
+      </div>
+      <Container>
+        <Row>
+          {biens.map(bien => {
+            const couverturePhoto = bien.photos?.find(photo => photo.est_couverture);
+
+            return (
+              <Col md={4} key={bien.id_bien} className="mb-4">
+                <Link to={`/account/places/${bien.id_bien}`} className="text-decoration-none">
+                  <Card className="property-card">
+                    {couverturePhoto && couverturePhoto.chemin_photo && (
+                      <Card.Img
+                        variant="top"
+                        src={`http://localhost/client/src/assets/images/stay/${bien.id_bien}${couverturePhoto.chemin_photo}`}
+                        alt={bien.nom_bien}
+                        className="property-card-img"
+                      />
+                    )}
+                    <Card.Body>
+                      <Card.Title>{bien.nom_bien}</Card.Title>
+                      <Card.Text>
+                        <strong>{bien.tarif_bien} € / nuit</strong>
+                      </Card.Text>
+
+                    </Card.Body>
+                  </Card>
+                </Link>
+              </Col>
+            );
+          })}
+        </Row>
+      </Container>
+    </>
   );
 };
 

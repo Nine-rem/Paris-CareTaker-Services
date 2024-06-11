@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Nav } from 'react-bootstrap';
 import pmr from '../assets/images/pmr.png';
 import animal from '../assets/images/animal.png';
 import localisation from '../assets/images/localisation.png';
@@ -10,6 +10,7 @@ import price from '../assets/images/price.png';
 import { UserContext } from '../userContext';
 import axios from 'axios';
 import {  differenceInCalendarDays, differenceInDays } from 'date-fns';
+import { Navigate } from 'react-router-dom';
 
 export default function StayPage() {
     const { id } = useParams();
@@ -25,6 +26,7 @@ export default function StayPage() {
     const [checkOut, setCheckOut] = useState('');
     const [numberOfGuests, setNumberOfGuests] = useState(1);
     const numberOfDays = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
+    const [redirect, setRedirect] = useState('');
     
 
 
@@ -32,7 +34,24 @@ export default function StayPage() {
     const urlPhoto = 'http://localhost/client/src/assets/images/stay/';
     const urlService = 'http://localhost/client/src/assets/images/equipment-service/';
     const urlEquipement = 'http://localhost/client/src/assets/images/equipment-service/';
+    
 
+    async function BookThisPlace() {
+        const response = await axios.post('/bookings', {
+            id_bien: id,
+            date_arrivee: checkIn,
+            date_depart: checkOut,
+            nb_voyageurs: numberOfGuests,
+            prix_total: numberOfDays * stayData[0].tarif_bien
+        });
+        const bookingId = response.data.id_reservation;
+        setRedirect(`/account/bookings/${bookingId}`);
+    }
+    if (redirect) {
+        return <Navigate to={redirect} />;
+    }
+
+    
     useEffect(() => {
         const fetchStayData = async () => {
             try {
@@ -89,7 +108,7 @@ export default function StayPage() {
         const checkOwnership = async () => {
             try {
                 const response = await axios.get(`/bien-owner`);
-                console.log(response.data);
+                console.log("ownership:",response.data);
                 if (response.data.length > 0) {
                     setIsOwner(true);
                 }
@@ -169,7 +188,7 @@ export default function StayPage() {
                         <input type='number' className='reservation-input-field' value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)}/>
                         </div>
 
-                    <Button className="btn btn-dark btn-hover-brown mt-5 mx-3">Réserver ce logement
+                    <Button className="btn btn-dark btn-hover-brown mt-5 mx-3" onClick={BookThisPlace}>Réserver ce logement
                     {numberOfDays > 0 && <span> pour {numberOfDays * data.tarif_bien} €</span>}
                     </Button>
                     </div>

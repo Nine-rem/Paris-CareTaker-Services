@@ -1,14 +1,17 @@
 import React from "react";
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate,useParams } from "react-router-dom";
 import axios from "axios";
-import AccountNav from "../accountNav";
+
 
 export default function BookingPage() {
     return(
         <>
-        <AccountNav />
-        <h1>Mes réservations</h1>
+        const { id } = useParams();
+
+        <h1>Ma réservation</h1>
+        <h2>Numéro de réservation : {id}</h2>
+
         </>
     )
 }
