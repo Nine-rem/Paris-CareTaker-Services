@@ -26,6 +26,7 @@ app.use(express.json())
 app.use(cookieParser());
 app.use("/uploads",express.static(__dirname + '/uploads'));
 
+const DOMAIN = 'http://localhost:5173';
 /* ----------------------------------------------------------
       Gestion des utilisateurs
 ---------------------------------------------------------- */
@@ -166,7 +167,7 @@ app.post("/register", async (req, res) => {
 
 
 app.get('/mdp', (req, res) => {
-  bcrypt.hash('kirtika', 10).then((hash) => {
+  bcrypt.hash('a', 10).then((hash) => {
     res.json({ hash });
   });
 });
@@ -872,21 +873,6 @@ app.get('/places', (req, res) => {
   });
 });
 
-// app.post('/bookings', (req, res) => { 
-//   const { token } = req.cookies;
-//   jwt.verify(token, secretKey, (err, decoded) => {
-//     if (err) {
-//       return res.status(401).json({ message: 'Token invalide' });
-//     }
-//     const id_utilisateur = decoded.userId;
-//     if (!id_utilisateur) {
-//       return res.status(401).json({ message: 'Utilisateur non connecté' });
-//     }
-//     const {
-//       id_bien,
-//       date_arrivee,
-//       date_depart,
-//     }
 
 //photo de couverture
 app.get('/photo-cover/:id', (req, res) => {
@@ -1021,7 +1007,7 @@ app.post('/bookings', (req, res) => {
 
     const query = `
       INSERT INTO pcs_reservation (bien_reserve, utilisateur_reservation, date_debut_reservation, date_fin_reservation, nb_voyageurs, prix_total, statut_reservation, date_reservation, facture_reservation) 
-      VALUES (?, ?, ?, ?, ?, ?, 0, NOW(),1);
+      VALUES (?, ?, ?, ?, ?, ?, 1, NOW(),1);
     `;
     const values = [id_bien, id_utilisateur, date_arrivee, date_depart, nb_voyageurs, prix_total];
 
@@ -1038,28 +1024,63 @@ app.post('/bookings', (req, res) => {
 
 // Extraction des réservations d'un utilisateur
 app.get('/bookings', (req, res) => {
-  const { token } = req.cookies;
+  const token = req.cookies.token; 
+  if (!token) {
+    return res.status(401).json({ message: 'Utilisateur non connecté' });
+  }
+
   jwt.verify(token, secretKey, (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Token invalide' });
     }
+
     const id_utilisateur = decoded.userId;
     if (!id_utilisateur) {
       return res.status(401).json({ message: 'Utilisateur non connecté' });
     }
-    connection.query('SELECT * FROM pcs_reservation WHERE utilisateur_reservation = ?', [id_utilisateur], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erreur lors de la récupération des réservations' });
+
+    // Récupération de toutes les réservations de l'utilisateur
+    connection.query('SELECT * FROM pcs_reservation WHERE utilisateur_reservation = ? AND statut_reservation = 1', [id_utilisateur], (err, reservations) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erreur lors de la récupération des réservations' });
       }
-      res.json(results);
+
+      if (reservations.length === 0) {
+        return res.status(200).json([]);
+      }
+
+      // Récupération des biens associés aux réservations
+      const bienIds = reservations.map(reservation => reservation.bien_reserve);
+      connection.query('SELECT * FROM pcs_bien WHERE id_bien IN (?)', [bienIds], (err, biens) => {
+        if (err) {
+          return res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
+        }
+
+        // Récupération des photos de couverture associées aux biens
+        connection.query('SELECT * FROM pcs_photo WHERE photo_bien_id IN (?) AND est_couverture = 1', [bienIds], (err, photos) => {
+          if (err) {
+            return res.status(500).json({ error: 'Erreur lors de la récupération des photos' });
+          }
+
+          // Association des réservations avec les détails des biens et des photos
+          const reservationsWithDetails = reservations.map(reservation => {
+            const bien = biens.find(b => b.id_bien === reservation.bien_reserve);
+            const photo = photos.find(p => p.photo_bien_id === reservation.bien_reserve);
+
+            return {
+              ...reservation,
+              nom_bien: bien ? bien.nom_bien : null,
+              tarif_bien: bien ? bien.tarif_bien : null,
+              chemin_photo: photo ? photo.chemin_photo : null
+            };
+          });
+
+          res.status(200).json(reservationsWithDetails);
+        });
+      });
     });
-
   });
-  connection.query('SELECT * FROM pcs_bien')
 });
-
-
 /* ----------------------------------------------------------
       Gestion des agences
 ---------------------------------------------------------- */

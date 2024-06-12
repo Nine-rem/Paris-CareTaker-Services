@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Button, Nav } from 'react-bootstrap';
+import { Link, useParams, Navigate } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import pmr from '../assets/images/pmr.png';
 import animal from '../assets/images/animal.png';
 import localisation from '../assets/images/localisation.png';
@@ -9,8 +9,7 @@ import capacite from '../assets/images/capacite.png';
 import price from '../assets/images/price.png';
 import { UserContext } from '../userContext';
 import axios from 'axios';
-import {  differenceInCalendarDays, differenceInDays } from 'date-fns';
-import { Navigate } from 'react-router-dom';
+import { differenceInCalendarDays } from 'date-fns';
 
 export default function StayPage() {
     const { id } = useParams();
@@ -25,42 +24,40 @@ export default function StayPage() {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const [numberOfGuests, setNumberOfGuests] = useState(1);
+    const [dateError, setDateError] = useState(null);
     const numberOfDays = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
     const [redirect, setRedirect] = useState('');
-    
 
-
-    const url = 'http://localhost:5000';
     const urlPhoto = 'http://localhost/client/src/assets/images/stay/';
     const urlService = 'http://localhost/client/src/assets/images/equipment-service/';
     const urlEquipement = 'http://localhost/client/src/assets/images/equipment-service/';
-    
 
     async function BookThisPlace() {
-        const response = await axios.post('/bookings', {
-            id_bien: id,
-            date_arrivee: checkIn,
-            date_depart: checkOut,
-            nb_voyageurs: numberOfGuests,
-            prix_total: numberOfDays * stayData[0].tarif_bien
-        });
-        const bookingId = response.data.id_reservation;
-        setRedirect(`/account/bookings/${bookingId}`);
-    }
-    if (redirect) {
-        return <Navigate to={redirect} />;
+        if (numberOfDays <= 0) {
+            setDateError('La date de départ doit être postérieure à la date d\'arrivée.');
+            return;
+        }
+        
+        try {
+            const response = await axios.post(`/bookings`, {
+                id_bien: id,
+                date_arrivee: checkIn,
+                date_depart: checkOut,
+                nb_voyageurs: numberOfGuests,
+                prix_total: numberOfDays * stayData[0].tarif_bien
+            });
+            const bookingId = response.data.reservationId;
+            setRedirect(`/account/bookings/${bookingId}`);
+        } catch (error) {
+            console.error("Erreur lors de la réservation :", error);
+        }
     }
 
-    
     useEffect(() => {
         const fetchStayData = async () => {
             try {
-                const response = await fetch(`${url}/bien/${id}`);
-                if (!response.ok) {
-                    throw new Error('Erreur lors du chargement des données.');
-                }
-                const data = await response.json();
-                setStayData(data);
+                const response = await axios.get(`/bien/${id}`);
+                setStayData(response.data);
             } catch (err) {
                 setError(err.message);
             }
@@ -68,12 +65,8 @@ export default function StayPage() {
 
         const fetchStayPhotos = async () => {
             try {
-                const response = await fetch(`${url}/bien-photo/${id}`);
-                if (!response.ok) {
-                    throw new Error('Erreur lors du chargement des photos.');
-                }
-                const photos = await response.json();
-                setStayPhotos(photos);
+                const response = await axios.get(`/bien-photo/${id}`);
+                setStayPhotos(response.data);
             } catch (err) {
                 setError(err.message);
             }
@@ -81,12 +74,8 @@ export default function StayPage() {
 
         const fetchEquipments = async () => {
             try {
-                const response = await fetch(`${url}/bien-equipement/${id}`);
-                if (!response.ok) {
-                    throw new Error('Erreur lors du chargement des équipements.');
-                }
-                const equipmentData = await response.json();
-                setEquipments(equipmentData);
+                const response = await axios.get(`/bien-equipement/${id}`);
+                setEquipments(response.data);
             } catch (err) {
                 setError(err.message);
             }
@@ -94,12 +83,8 @@ export default function StayPage() {
 
         const fetchServices = async () => {
             try {
-                const response = await fetch(`${url}/bien-service/${id}`);
-                if (!response.ok) {
-                    throw new Error('Erreur lors du chargement des services.');
-                }
-                const serviceData = await response.json();
-                setServices(serviceData);
+                const response = await axios.get(`/bien-service/${id}`);
+                setServices(response.data);
             } catch (err) {
                 setError(err.message);
             }
@@ -108,7 +93,7 @@ export default function StayPage() {
         const checkOwnership = async () => {
             try {
                 const response = await axios.get(`/bien-owner`);
-                console.log("ownership:",response.data);
+                console.log("ownership:", response.data);
                 if (response.data.length > 0) {
                     setIsOwner(true);
                 }
@@ -126,6 +111,10 @@ export default function StayPage() {
         }
         setLoading(false);
     }, [id, ready, user]);
+
+    if (redirect) {
+        return <Navigate to={redirect} />;
+    }
 
     if (loading || !ready) {
         return <p>Chargement...</p>;
@@ -173,21 +162,21 @@ export default function StayPage() {
                 ))}
                 <div className="d-flex justify-content-center align-items-center">
                     {stayData && stayData.length > 0 && stayData.map((data) => (
-                    <div className='reservation-input'>
+                    <div className='reservation-input' key={data.id_bien}>
                         <div className='text-bold'> Prix: {data.tarif_bien} €/nuit</div>
                         <div className='reservation-input'>
                         <label>Check-in:</label>
-                        <input type='date' className='reservation-input-field' value={checkIn} onChange={ev => setCheckIn(ev.target.value)}/>
+                        <input type='date' className='reservation-input-field' value={checkIn} onChange={ev => setCheckIn(ev.target.value)} />
                         </div>
                         <div className='reservation-input'>
                         <label>Check-out:</label>
-                        <input type='date' className='reservation-input-field' value={checkOut} onChange={ev => setCheckOut(ev.target.value)}/>
+                        <input type='date' className='reservation-input-field' value={checkOut} onChange={ev => setCheckOut(ev.target.value)} />
                         </div>
                         <div className='reservation-input'>
                         <label>Nombre de voyageurs:</label>
-                        <input type='number' className='reservation-input-field' value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)}/>
+                        <input type='number' className='reservation-input-field' value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)} />
                         </div>
-
+                        {dateError && <p className="text-danger">{dateError}</p>}
                     <Button className="btn btn-dark btn-hover-brown mt-5 mx-3" onClick={BookThisPlace}>Réserver ce logement
                     {numberOfDays > 0 && <span> pour {numberOfDays * data.tarif_bien} €</span>}
                     </Button>

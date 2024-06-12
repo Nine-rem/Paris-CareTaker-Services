@@ -445,15 +445,6 @@ CREATE TABLE IF NOT EXISTS `pcs_piece` (
   KEY `bien` (`bien_piece`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 
---
--- Déchargement des données de la table `pcs_piece`
---
-
--- INSERT INTO `pcs_piece` (`id_piece`, `nom_piece`, `description_piece`, `est_privatif_piece`, `bien_piece`, `surface_piece`, `type_piece`) VALUES
--- (11, 'Salon', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', 1, 2, 50.00, 1),
--- (12, 'Cuisine', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula.', 1, 2, 20.00, 3),
--- (13, 'Chambre double', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', 1, 2, 15.00, 2),
--- (14, 'Salle d''eau avec WC', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', 1, 2, 15.00, 5);
 
 -- --------------------------------------------------------
 
@@ -545,20 +536,6 @@ CREATE TABLE IF NOT EXISTS `pcs_type_piece` (
   PRIMARY KEY (`id_type_piece`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 
---
--- Déchargement des données de la table `pcs_type_piece`
---
-
-INSERT INTO `pcs_type_piece` (`id_type_piece`, `nom_type_piece`) VALUES
-(1, 'Salon'),
-(2, 'Chambre'),
-(3, 'Cuisine'),
-(4, 'Salle à manger'),
-(5, 'Salle d''eau'),
-(6, 'Salle de bain'),
-(7, 'WC'),
-(8, 'Buanderie'),
-(9, 'Extérieur');
 
 -- --------------------------------------------------------
 
@@ -608,12 +585,6 @@ CREATE TABLE IF NOT EXISTS `pcs_utilisateur` (
   KEY `langue` (`langue_utilisateur`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
---
--- Déchargement des données de la table `pcs_utilisateur`
---
-
-INSERT INTO `pcs_utilisateur` (`id_utilisateur`, `societe_utilisateur`, `SIRET_utilisateur`, `nom_utilisateur`, `prenom_utilisateur`, `naissance_utilisateur`, `adresse_utilisateur`, `cp_utilisateur`, `ville_utilisateur`, `tel_utilisateur`, `email_utilisateur`, `pwd`, `formule_utilisateur`, `langue_utilisateur`, `date_creation_utilisateur`, `date_maj_utilisateur`, `derniere_connexion_utilisateur`, `est_admin`, `est_bailleur`, `est_prestataire`, `est_banni`, `token`) VALUES
-(2, NULL, NULL, 'SENTHILNATHAN', 'Kirtika', '1996-01-23', '15 avenue Paul Herbé', '92390', 'Villeneuve la Garenne', '0766516073', 'kirtika.sn@gmail.com', 'kirtika', 0, 1, '2024-04-15 12:43:49', '2024-04-15 12:43:49', '2024-04-15 12:43:49', 1, 1, 0, 0, NULL);
 
 --
 -- Contraintes pour les tables déchargées
@@ -763,7 +734,7 @@ COMMIT;
 --
 ALTER TABLE pcs_bien
 ADD COLUMN heure_arrivee TIME NOT NULL,
-ADD COLUMN heure_depart TIME NOT NULL
+ADD COLUMN heure_depart TIME NOT NULL;
 
 
 --
@@ -774,7 +745,7 @@ MODIFY COLUMN token VARCHAR(255);
 
 --
 -- Modification de la table pcs_photo
--- 
+--
 
 ALTER TABLE `pcs_photo`
 ADD COLUMN `photo_bien_id` SMALLINT UNSIGNED NOT NULL;
@@ -782,18 +753,72 @@ ADD COLUMN `photo_bien_id` SMALLINT UNSIGNED NOT NULL;
 ALTER TABLE `pcs_photo`
 ADD CONSTRAINT `pcs_photo_ibfk_2` FOREIGN KEY (`photo_bien_id`) REFERENCES `pcs_bien` (`id_bien`);
 
+
+--
+-- Modification de la table pcs_reservation
+--
+ALTER TABLE `pcs_reservation`
+ADD `nb_voyageurs` INT NOT NULL,
+ADD `prix_total` FLOAT NOT NULL,
+ADD `statut_reservation` TINYINT NOT NULL;
+
+
+
+
+
+----------------------------------------------------------------------
+-- Insertion de données de test
+----------------------------------------------------------------------
+
+--
+-- Déchargement des données de la table `pcs_utilisateur`
+--
+-- mdp = a
+-- email = k@s.com
+INSERT INTO `pcs_utilisateur`
+(`id_utilisateur`, `societe_utilisateur`, `SIRET_utilisateur`, `nom_utilisateur`, `prenom_utilisateur`, `naissance_utilisateur`, `adresse_utilisateur`, `cp_utilisateur`, `ville_utilisateur`, `tel_utilisateur`, `email_utilisateur`, `pwd`, `formule_utilisateur`, `langue_utilisateur`, `date_creation_utilisateur`, `date_maj_utilisateur`, `derniere_connexion_utilisateur`, `est_admin`, `est_bailleur`, `est_prestataire`, `est_banni`, `token`) VALUES
+(2, NULL, NULL, 'SENTHILNATHAN', 'Kirtika', '1996-01-23', '15 avenue Paul Herbé', '92390', 'Villeneuve la Garenne', '0766516073', 'k@s.com', '$2a$10$YYY.pEY4t1ZzG4Q2LMMdHOlyLpiUZ1RnEZzKiPTfxsYME/lT7AJy6', 0, 1, '2024-04-15 12:43:49', '2024-04-15 12:43:49', '2024-04-15 12:43:49', 1, 1, 0, 0, NULL);
+
+--
+-- Déchargement des données de la table `pcs_type_piece`
+--
+
+INSERT INTO `pcs_type_piece` (`id_type_piece`, `nom_type_piece`) VALUES
+(1, 'Salon'),
+(2, 'Chambre'),
+(3, 'Cuisine'),
+(4, 'Salle à manger'),
+(5, 'Salle d''eau'),
+(6, 'Salle de bain'),
+(7, 'WC'),
+(8, 'Buanderie'),
+(9, 'Extérieur');
+
+--
+-- Déchargement des données de la table `pcs_piece`
+--
+
+-- INSERT INTO `pcs_piece` (`id_piece`, `nom_piece`, `description_piece`, `est_privatif_piece`, `bien_piece`, `surface_piece`, `type_piece`) VALUES
+-- (11, 'Salon', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', 1, 2, 50.00, 1),
+-- (12, 'Cuisine', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula.', 1, 2, 20.00, 3),
+-- (13, 'Chambre double', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', 1, 2, 15.00, 2),
+-- (14, 'Salle d''eau avec WC', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel ipsum sit amet est consequat laoreet. Mauris tempor elit a ipsum rhoncus, quis malesuada ligula vehicula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum quis nisi eu nibh aliquam commodo ut accumsan ex. ', 1, 2, 15.00, 5);
+
+
+
+
 --
 -- Insertion de biens + photos + pièces
 --
 
 -- Biens
 -- Insertion de biens
-INSERT INTO `pcs_bien` (1,`nom_bien`, `statut_bien`, `adresse_bien`, `cp_bien`, `ville_bien`, `type_location_bien`, `capacite_bien`, `surface_bien`, `animal_ok_bien`, `PMR_ok_bien`, `description_bien`, `tarif_bien`, `bailleur`, `agence_principale_bien`) VALUES
-(2,'Villa avec vue sur la mer', 0, '5 rue Goury', '77654', 'Villeneuve la Garenne', 'Logement entier', 9, 150.00, 1, 1, 'Villa luxueuse avec vue sur la mer.', 130.00, 2, 1),
-(3,'Appartement cosy', 0, '10 rue des Lilas', '75000', 'Paris', 'Appartement', 4, 60.00, 0, 0, 'Appartement confortable au centre-ville.', 80.00, 2, 1),
-(4,'Chalet en montagne', 0, '12 chemin des Neiges', '73000', 'Chambéry', 'Chalet', 6, 120.00, 1, 1, 'Chalet chaleureux au cœur des montagnes.', 150.00, 2, 1),
-(5,'Maison de campagne', 0, '8 rue de la Forêt', '45000', 'Orléans', 'Maison', 5, 110.00, 1, 0, 'Maison tranquille entourée de nature.', 100.00, 2, 1),
-(6,'Studio moderne', 0, '3 avenue des Champs', '06000', 'Nice', 'Studio', 2, 30.00, 0, 0, 'Studio moderne et bien équipé.', 70.00, 2, 1);
+INSERT INTO `pcs_bien` (`id_bien`,`nom_bien`, `statut_bien`, `adresse_bien`, `cp_bien`, `ville_bien`, `type_location_bien`, `capacite_bien`, `surface_bien`, `animal_ok_bien`, `PMR_ok_bien`, `description_bien`, `tarif_bien`, `bailleur`, `agence_principale_bien`) VALUES
+(1,'Villa avec vue sur la mer', 0, '5 rue Goury', '77654', 'Villeneuve la Garenne', 'Logement entier', 9, 150.00, 1, 1, 'Villa luxueuse avec vue sur la mer.', 130.00, 2, 1),
+(2,'Appartement cosy', 0, '10 rue des Lilas', '75000', 'Paris', 'Appartement', 4, 60.00, 0, 0, 'Appartement confortable au centre-ville.', 80.00, 2, 1),
+(3,'Chalet en montagne', 0, '12 chemin des Neiges', '73000', 'Chambéry', 'Chalet', 6, 120.00, 1, 1, 'Chalet chaleureux au cœur des montagnes.', 150.00, 2, 1),
+(4,'Maison de campagne', 0, '8 rue de la Forêt', '45000', 'Orléans', 'Maison', 5, 110.00, 1, 0, 'Maison tranquille entourée de nature.', 100.00, 2, 1),
+(5,'Studio moderne', 0, '3 avenue des Champs', '06000', 'Nice', 'Studio', 2, 30.00, 0, 0, 'Studio moderne et bien équipé.', 70.00, 2, 1);
 
 -- Pièces pour chaque bien
 -- Villa avec vue sur la mer
@@ -866,19 +891,11 @@ INSERT INTO `pcs_photo` (`nom_photo`, `description_photo`, `chemin_photo`, `piec
 ('sdb5', 'Salle de bain avec douche.', '/sdb5.jpg', (SELECT id_piece FROM pcs_piece WHERE nom_piece = 'Salle de bain' AND bien_piece = 5), 0, 5);
 
 
---
--- Modification de la table pcs_reservation
---
-ALTER TABLE `pcs_reservation` ADD
-`nb_voyageurs` INT NOT NULL `date_fin_reservation`,
-ADD `prix_total` FLOAT NOT NULL `nb_voyageurs`,
-ADD `statut_reservation` TINYINT NOT NULL `prix_total`;
 
-
-
-
-
-
+-- 
+-- Facture test
+-- 
+INSERT INTO `pcs_facture` (`id_facture`, `type_facture`, `statut_facture`, `date_facture`) VALUES ('1', 'test', '1', '2024-06-11');
 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

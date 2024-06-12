@@ -26,4 +26,9 @@
   .container {
     margin-top: 20px;
   }
-  
+  .icon-small {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
