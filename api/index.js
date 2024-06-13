@@ -282,6 +282,8 @@ app.post('/logout', (req, res) => {
 /* ----------------------------------------------------------
       Gestion des biens
 ---------------------------------------------------------- */
+
+/* NON FONCTIONNEL */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const storage = multer.diskStorage({
@@ -331,7 +333,9 @@ app.delete("/upload/:filename", (req, res) => {
     }
   });
 });
+/* FIN */
 
+/* AJOUTER DES PHOTOS ?????  */
 app.post('/places', (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, secretKey, (err, decoded) => {
@@ -767,17 +771,17 @@ app.put('/places/:id', (req, res) => {
 });
 
 
-
-app.get('/bien-validated', (req, res) => {
-  connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, results) => {
-    if (err) {
-      res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
-    } else {
-      res.status(200).json(results);
-    }
-  });
-}
-);
+//Affichage pour StayAll
+// app.get('/bien-validated', (req, res) => {
+//   connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, results) => {
+//     if (err) {
+//       res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
+//     } else {
+//       res.status(200).json(results);
+//     }
+//   });
+// }
+// );
 
 app.get('/bien-owner', (req, res) => { 
   const { token } = req.cookies;
@@ -801,6 +805,8 @@ app.get('/bien-owner', (req, res) => {
   );
 });
 
+
+//Affichage pour stayAllPage
 app.get('/biens', (req, res) => {
 
   connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 1', (err, biens) => {
@@ -827,6 +833,7 @@ app.get('/biens', (req, res) => {
   });
 });
 
+//affichage des biens d'un utilisateurs
 app.get('/places', (req, res) => {
   const token = req.cookies.token; 
   if (!token) {
@@ -874,32 +881,32 @@ app.get('/places', (req, res) => {
 });
 
 
-//photo de couverture
-app.get('/photo-cover/:id', (req, res) => {
-  const id = req.params.id;
-  console.log(id);
-  const query = `
-  SELECT chemin_photo 
-  FROM pcs_photo
-  JOIN pcs_piece ON pcs_photo.piece_photo = pcs_piece.id_piece
-  JOIN pcs_bien ON pcs_piece.bien_piece = pcs_bien.id_bien
-  WHERE pcs_photo.est_couverture = 1
-  AND pcs_bien.id_bien = ?;
+//photo de couverture SANS photo_bien id dans pcs_photo
+// app.get('/photo-cover/:id', (req, res) => {
+//   const id = req.params.id;
+//   console.log(id);
+//   const query = `
+//   SELECT chemin_photo 
+//   FROM pcs_photo
+//   JOIN pcs_piece ON pcs_photo.piece_photo = pcs_piece.id_piece
+//   JOIN pcs_bien ON pcs_piece.bien_piece = pcs_bien.id_bien
+//   WHERE pcs_photo.est_couverture = 1
+//   AND pcs_bien.id_bien = ?;
   
-  `;
-  values = [id]; 
+//   `;
+//   values = [id]; 
 
-  connection.query(query, [id], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Erreur lors de la récupération de la photo de couverture' });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Aucune photo de couverture trouvée' });
-    }
-    const photo = results[0];
-    res.status(200).json({ url: `http://localhost/client/src/assets/images/stay/${id}${photo.chemin_photo}`, alt: `Photo de couverture pour le bien ${id}` });
-  });
-});
+//   connection.query(query, [id], (err, results) => {
+//     if (err) {
+//       return res.status(500).json({ error: 'Erreur lors de la récupération de la photo de couverture' });
+//     }
+//     if (results.length === 0) {
+//       return res.status(404).json({ error: 'Aucune photo de couverture trouvée' });
+//     }
+//     const photo = results[0];
+//     res.status(200).json({ url: `http://localhost/client/src/assets/images/stay/${id}${photo.chemin_photo}`, alt: `Photo de couverture pour le bien ${id}` });
+//   });
+// });
 
 // Extraction des informations d'un bien
 app.get('/bien/:id', (req, res) => {
@@ -1039,7 +1046,6 @@ app.get('/bookings', (req, res) => {
       return res.status(401).json({ message: 'Utilisateur non connecté' });
     }
 
-    // Récupération de toutes les réservations de l'utilisateur
     connection.query('SELECT * FROM pcs_reservation WHERE utilisateur_reservation = ? AND statut_reservation = 1', [id_utilisateur], (err, reservations) => {
       if (err) {
         return res.status(500).json({ error: 'Erreur lors de la récupération des réservations' });
@@ -1049,20 +1055,19 @@ app.get('/bookings', (req, res) => {
         return res.status(200).json([]);
       }
 
-      // Récupération des biens associés aux réservations
+     
       const bienIds = reservations.map(reservation => reservation.bien_reserve);
       connection.query('SELECT * FROM pcs_bien WHERE id_bien IN (?)', [bienIds], (err, biens) => {
         if (err) {
           return res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
         }
 
-        // Récupération des photos de couverture associées aux biens
         connection.query('SELECT * FROM pcs_photo WHERE photo_bien_id IN (?) AND est_couverture = 1', [bienIds], (err, photos) => {
           if (err) {
             return res.status(500).json({ error: 'Erreur lors de la récupération des photos' });
           }
 
-          // Association des réservations avec les détails des biens et des photos
+
           const reservationsWithDetails = reservations.map(reservation => {
             const bien = biens.find(b => b.id_bien === reservation.bien_reserve);
             const photo = photos.find(p => p.photo_bien_id === reservation.bien_reserve);
@@ -1081,6 +1086,7 @@ app.get('/bookings', (req, res) => {
     });
   });
 });
+
 /* ----------------------------------------------------------
       Gestion des agences
 ---------------------------------------------------------- */

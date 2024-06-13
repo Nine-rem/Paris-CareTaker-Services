@@ -29,31 +29,37 @@ function Header() {
                     <div className="offcanvas-body">
                     <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
                         <li className="nav-item">
-                        <a className="nav-link active" aria-current="page" href="#">Accueil</a>
+                        <Link to="/"><a className="nav-link active" aria-current="page" >Accueil</a></Link>
+                        
                         </li>
                         <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Votre compte
                         </a>
                         <ul className="dropdown-menu">
-                            <li><a className="dropdown-item" href="#">Votre profil</a></li>
+                            <Link to="/account"><li><a className="dropdown-item">Votre profil</a></li></Link>
                             <li><a className="dropdown-item" href="#">Vos documents</a></li>
                             <li><a className="dropdown-item" href="#">Vos comptes</a></li>
-                            <li><a className="dropdown-item" href="#">Vos réservations</a></li>
+                            <Link to="/account/bookings"><li><a className="dropdown-item">Vos réservations</a></li></Link>
+                            
                             <li><a className="dropdown-item" href="#">Logements favoris</a></li>
                         </ul>
                         </li>
+                        {user && user.isLandlord == 1 &&
                         <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Espace bailleur
                         </a>
                         <ul className="dropdown-menu">
-                            <li><a className="dropdown-item" href="#">Nouveau bien</a></li>                        
-                            <li><a className="dropdown-item" href="#">Vos biens</a></li>
+                            <Link to="/account/places/new"><li><a className="dropdown-item" href="#">Nouveau bien</a></li></Link>
+                                                    
+                            <Link to="/account/places"><li><a className="dropdown-item" href="#">Vos biens</a></li></Link>
                             <li><a className="dropdown-item" href="#">Réservations</a></li>
                             <li><a className="dropdown-item" href="#">Vos interventions</a></li>
                         </ul>
                         </li>
+                        }
+                        {user && user.isService == 1 && 
                         <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Espace prestataire
@@ -64,6 +70,8 @@ function Header() {
                             <li><a className="dropdown-item" href="#">Vos interventions</a></li>
                         </ul>
                         </li>
+                        }
+                        {user && user.isAdmin == 1 &&
                         <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Espace administrateur
@@ -77,8 +85,10 @@ function Header() {
                             <li><a className="dropdown-item" href="#">Gestion technique</a></li>
                         </ul>
                         </li>
+                        }
                         <li className="nav-item">
-                        <a className="nav-link" href="#">Trouvez un logement</a>
+                            <Link to="/stayAll"><a className="nav-link" href="#">Trouvez un logement</a></Link>
+                        
                         </li>
                         <li className="nav-item">
                         <a className="nav-link" href="#">Trouvez un service</a>
