@@ -5,8 +5,14 @@ import {Button} from "react-bootstrap";
 import '../sytles/admin.css';
 import { Navigate } from "react-router-dom";
 export default function AdminPage() {
-    function StayValidation(){
-        return <Navigate to="/stayValidation" />
+    const [redirect, setRedirect] = useState('');
+    const StayValidation = () => {
+        setRedirect('/account/stayValidation');
+    }  
+
+
+    if (redirect) {
+        return <Navigate to={redirect} />;
     }
     return(
 

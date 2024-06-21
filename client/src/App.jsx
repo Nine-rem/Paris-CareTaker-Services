@@ -22,6 +22,7 @@ import BookingPage from './pages/bookingPage.jsx';
 import BookingsPage from './pages/bookingsPage.jsx';
 import StayPage from './pages/stayPage.jsx';
 import AdminPage from './pages/adminPage.jsx';
+import StayValidation from './pages/stayValidation.jsx';
 axios.defaults.baseURL = 'http://localhost:5000';
 axios.defaults.withCredentials = true;
 function App() {
@@ -43,6 +44,7 @@ function App() {
           <Route path= "/account/admin" element={<AdminPage />} />
           <Route path="/account/bookings" element={<BookingsPage/>} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
+          <Route path="account/stayValidation" element={<StayValidation />} />
           <Route path="/service" element={<ServicePage />} />
           <Route path="/quotation" element={<QuotationPage />} />
           <Route path="/legal" element={<LegalPage />} />

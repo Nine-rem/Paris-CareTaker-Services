@@ -832,6 +832,32 @@ app.get('/biens', (req, res) => {
     });
   });
 });
+//Bien en attente de validation
+app.get('/biens-attente', (req, res) => {
+
+  connection.query('SELECT * FROM pcs_bien WHERE statut_bien = 0', (err, biens) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erreur lors de la récupération des biens' });
+    }
+    
+
+    connection.query('SELECT * FROM pcs_photo', (err, photos) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erreur lors de la récupération des photos' });
+      }
+
+
+      const biensAvecPhotos = biens.map(bien => {
+        return {
+          ...bien,
+          photos: photos.filter(photo => photo.photo_bien_id === bien.id_bien)
+        };
+      });
+
+      res.status(200).json(biensAvecPhotos);
+    });
+  });
+});
 
 //affichage des biens d'un utilisateurs
 app.get('/places', (req, res) => {
