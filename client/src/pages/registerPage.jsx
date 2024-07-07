@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 export default function RegisterPage() {
     const [lastName, setLastName] = useState("");
@@ -22,6 +22,7 @@ export default function RegisterPage() {
     const [company, setCompany] = useState("");
     const [error, setError] = useState("");
     const [fieldErrors, setFieldErrors] = useState({}); 
+    const [redirect, setRedirect] = useState(false);
 
     async function registerUser(ev) {
         ev.preventDefault();
@@ -43,7 +44,7 @@ export default function RegisterPage() {
                 role,
                 company
             });
-
+            setRedirect(true);
             console.log('Utilisateur inscrit:', response.data.message);
         } catch (error) {
             console.error('Erreur lors de l\'inscription:', error);
@@ -58,10 +59,13 @@ export default function RegisterPage() {
         }
     }
 
+
     const handleRoleChange = (event) => {
         setRole(event.target.value);
     }
-
+    if (redirect) {
+        return <Navigate to = {"/"} />;
+    }
     return (
         <div id="register" className="d-flex justify-content-center align-items-center">
             <div id="signup" className="box w-80">
