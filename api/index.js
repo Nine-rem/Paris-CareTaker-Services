@@ -1020,6 +1020,8 @@ Réservation d'un bien
 
 */
 
+app.use('/assets', express.static(path.join(__dirname, '../client/src/assets')));
+
 app.post('/bookings', (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, secretKey, (err, decoded) => {

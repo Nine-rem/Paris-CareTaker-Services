@@ -28,7 +28,7 @@ export default function StayPage() {
     const numberOfDays = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
     const [redirect, setRedirect] = useState('');
 
-    const urlPhoto = 'http://localhost/client/src/assets/images/stay/';
+    const urlPhoto = 'http://localhost:5000/assets/images/stay/';
     const urlService = 'http://localhost/client/src/assets/images/equipment-service/';
     const urlEquipement = 'http://localhost/client/src/assets/images/equipment-service/';
 

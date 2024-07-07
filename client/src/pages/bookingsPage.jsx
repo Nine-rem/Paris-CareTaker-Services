@@ -42,7 +42,7 @@ export default function BookingsPage() {
                                         {couverturePhoto && (
                                             <Card.Img
                                                 variant="top"
-                                                src={`http://localhost/client/src/assets/images/stay/${booking.bien_reserve}${couverturePhoto}`}
+                                                src={`http://localhost:5000/assets/images/stay/${booking.bien_reserve}${couverturePhoto}`}
                                                 alt={booking.nom_bien}
                                                 className="property-card-img"
                                             />

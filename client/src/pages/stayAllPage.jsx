@@ -44,7 +44,7 @@ const StayAllPage = () => {
                     {couverturePhoto && couverturePhoto.chemin_photo && (
                       <Card.Img
                         variant="top"
-                        src={`http://localhost/client/src/assets/images/stay/${bien.id_bien}${couverturePhoto.chemin_photo}`}
+                        src={`http://localhost:5000/assets/images/stay/${bien.id_bien}${couverturePhoto.chemin_photo}`}
                         alt={bien.nom_bien}
                         className="property-card-img"
                       />
