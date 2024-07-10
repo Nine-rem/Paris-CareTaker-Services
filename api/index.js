@@ -104,7 +104,7 @@ app.post("/register", async (req, res) => {
       errorArray.birthdate = 'Date de naissance invalide';
     }
     
-    const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!regexPassword.test(password)) {
       errorArray.password = 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
     }
