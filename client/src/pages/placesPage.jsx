@@ -47,7 +47,7 @@ export default function PlacesPage() {
                                         {couverturePhoto && couverturePhoto.chemin_photo && (
                                             <Card.Img
                                                 variant="top"
-                                                src={`http://localhost:5000/client/src/assets/images/stay/${place.id_bien}${couverturePhoto.chemin_photo}`}
+                                                src={`http://localhost:5000/assets/images/stay/${place.id_bien}${couverturePhoto.chemin_photo}`}
                                                 alt={place.nom_bien}
                                                 className="property-card-img"
                                             />

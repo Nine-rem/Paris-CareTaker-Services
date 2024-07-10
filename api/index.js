@@ -74,7 +74,10 @@ app.post("/register", async (req, res) => {
     if (results.length > 0) {
       errorArray.email = 'Compte déjà existant';
     }
-
+    const postalCodeRegex = /^[0-9]{5}$/;
+    if (!postalCodeRegex.test(cp_utilisateur)) {
+      errorArray.postalCode = 'Code postal invalide';
+    }
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(email_utilisateur)) {
       errorArray.email = 'Email invalide';
@@ -104,7 +107,7 @@ app.post("/register", async (req, res) => {
       errorArray.birthdate = 'Date de naissance invalide';
     }
     
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    const regexPassword = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!regexPassword.test(password)) {
       errorArray.password = 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
     }
