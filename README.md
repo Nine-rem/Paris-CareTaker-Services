@@ -1,30 +1,5 @@
-Pour utiliser nodejs
+Le front se trouve dans le dossier client, afin de le démarrer il faut se déplacer dans le dossier client et lancer la commande yarn dev
+Le back se trouve dans le dossier api, afin de le démarrer il faut se déplacer dans le dossier api et lancer la commande nodemon index.js
+Il faut au préalable avoir lancé wamp xamp ou mamp et avoir le projet a la racine (www ou équivalent)
 
-1)Installer npm
-
-2)npm install yarn
-
-
-Paquets a installer dans api
-
-1)npm install nodejs
-
-2)npm install nodemon
-
-3)npm install express mysql body-parser bcryptjs jsonwebtoken
-
-4)npm install cookie-parser
-
-5)yarn add image-downloader
-
-6)yarn add multer 
-Pour mettre en route l'api
-
-nodemon index.js
-
-
-Pour utiliser react
-
-yarn add bootstrap
-
-yarn dev 
+Les autres dossiers sont la partie php qu'on n'utilise plus
