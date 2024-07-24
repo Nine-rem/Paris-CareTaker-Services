@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import '../stayAll.css';
 import AccountNav from '../accountNav';
 
-const StayValidation = () => {
+const StayAllPage = () => {
   const [biens, setBiens] = useState([]);
 
   useEffect(() => {

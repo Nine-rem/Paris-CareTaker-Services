@@ -29,7 +29,7 @@ export default function BookingPage() {
 
         <h1>Ma réservation</h1>
         <h2>Numéro de réservation : {id}</h2>
-        <Button>
+        <Button variant="dark">
             <Link to={`/account/bookings`}>Retour</Link>
         </Button>
 
